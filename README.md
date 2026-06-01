@@ -1,6 +1,6 @@
 # Amanah Blueprint Generator
 
-![Version](https://img.shields.io/badge/version-4.0.0-blue)
+![Version](https://img.shields.io/badge/version-5.0.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Claude Code](https://img.shields.io/badge/Claude%20Code-skill%20%2B%20agent-orange)
 ![Stack](https://img.shields.io/badge/stack-agnostic-purple)
@@ -102,6 +102,120 @@ flowchart LR
 
 ---
 
+## Atlas — Project Context Maps
+
+Blueprints are only as good as the project knowledge behind them. **Atlas** provides persistent project context that the generator reads BEFORE creating any blueprint.
+
+```mermaid
+flowchart LR
+    A[Atlas<br/>Project Context] --> B[Blueprint Generator]
+    B --> C[Blueprint<br/>Feature Spec]
+
+    D[CLAUDE.md<br/>Fallback] -.-> B
+
+    style A fill:#9B59B6,color:#fff
+    style B fill:#3498DB,color:#fff
+    style C fill:#2ECC71,color:#fff
+    style D fill:#95A5A6,color:#fff,stroke-dasharray: 5 5
+```
+
+### What Atlas Contains
+
+```
+.amanah/atlas/
+├── product.md       Product landscape — what it is, who uses it
+├── tech.md          Tech terrain — stack, libraries, databases
+├── structure.md     Code map — directory layout, patterns
+├── conventions.md   Rules of the land — gotchas, naming, do's/don'ts
+└── quickstart.md    Trails to follow — common task recipes
+```
+
+| Map | Purpose | Blueprint Impact |
+|-----|---------|-----------------|
+| `product.md` | Domain concepts, user roles, business model | Glossary uses real terms, requirements match domain |
+| `tech.md` | Stack, libraries, external services | Code examples use correct imports and SDKs |
+| `structure.md` | Directory layout, code patterns, file locations | Action items reference real file paths |
+| `conventions.md` | Gotchas, naming rules, import order | Generated code follows your standards |
+| `quickstart.md` | Recipes for common tasks | Action items match your project's workflows |
+
+### Without vs With Atlas
+
+| Without Atlas | With Atlas |
+|---|---|
+| Generic code examples | Uses YOUR imports, YOUR patterns |
+| Guesses file paths | References real file locations |
+| May violate conventions | Follows your coding standards |
+| Misses project-specific gotchas | Knows your edge cases upfront |
+| Blueprint works for any project | Blueprint works for YOUR project |
+
+### How to Set Up Atlas
+
+**Option A: Auto-Generate (Recommended)**
+
+The `amanah-atlas-generator` skill scans your codebase and generates all 5 atlas files with real content from your project:
+
+```
+generate atlas for this project
+```
+
+or
+
+```
+/atlas
+```
+
+The generator:
+1. Detects your stack (Python, Node, Go, Java, etc.)
+2. Reads CLAUDE.md, README, dependencies, config files
+3. Scans directory structure and code patterns
+4. Extracts conventions, gotchas, naming patterns
+5. Generates 5 filled-in atlas files (no placeholders)
+
+**Option B: Manual**
+
+```bash
+# Template files ship with .amanah/atlas/
+# Edit them manually with your project's details
+
+.amanah/atlas/
+├── product.md       ← Edit: Your product overview
+├── tech.md          ← Edit: Your stack details
+├── structure.md     ← Edit: Your directory layout
+├── conventions.md   ← Edit: Your coding rules
+└── quickstart.md    ← Edit: Your common recipes
+```
+
+### Custom Maps
+
+Beyond the 5 core maps, you can add **custom atlas files** for subsystem-specific deep dives:
+
+```
+.amanah/atlas/
+├── product.md           # Core — auto-generated
+├── tech.md              # Core — auto-generated
+├── structure.md         # Core — auto-generated
+├── conventions.md       # Core — auto-generated
+├── quickstart.md        # Core — auto-generated
+├── auth.md              # Custom — deep dive on authentication
+├── payments.md          # Custom — payment integration details
+├── pipeline.md          # Custom — data/message pipeline architecture
+├── custom-objects.md    # Custom — subsystem documentation
+└── {anything}.md        # Custom — whatever needs more context
+```
+
+The blueprint generator reads **ALL** `.md` files in `.amanah/atlas/` — core and custom alike. Add custom maps when a subsystem needs more context than the core maps provide.
+
+**When to add custom maps:**
+- A subsystem has its own architecture worth documenting (e.g., `pipeline-and-rag.md`)
+- A domain has specific rules that don't fit in `conventions.md` (e.g., `auth.md`)
+- An integration has its own gotchas and patterns (e.g., `payments.md`)
+
+Atlas files are committed to your repo (not gitignored) — they're part of your project documentation, like `CLAUDE.md` but modular.
+
+**No atlas?** The generator falls back to reading `CLAUDE.md` and `README.md`. Atlas is optional but recommended for better blueprints.
+
+---
+
 ## Quick Start
 
 ### Install (60 seconds)
@@ -109,13 +223,15 @@ flowchart LR
 ```mermaid
 flowchart LR
     A[1. Copy .amanah/] --> B[2. Install skill + agent]
-    B --> C[3. Add to CLAUDE.md]
-    C --> D[4. Start using]
+    B --> C[3. Fill in atlas]
+    C --> D[4. Add to CLAUDE.md]
+    D --> E[5. Start using]
 
     style A fill:#3498DB,color:#fff
     style B fill:#3498DB,color:#fff
-    style C fill:#3498DB,color:#fff
-    style D fill:#2ECC71,color:#fff
+    style C fill:#9B59B6,color:#fff
+    style D fill:#3498DB,color:#fff
+    style E fill:#2ECC71,color:#fff
 ```
 
 **Step 1** — Copy `.amanah/` to your project:
@@ -125,18 +241,31 @@ git clone https://github.com/nurulhadi/amanah-blueprint.git /tmp/abp
 cp -r /tmp/abp/.amanah /path/to/your-project/
 ```
 
-**Step 2** — Install the Claude Code skill + agent:
+**Step 2** — Install the Claude Code skills + agent:
 
 ```bash
 cd /path/to/your-project
 
+# Blueprint generator skill + agent
 mkdir -p .claude/skills/amanah-blueprint
 cp .amanah/SKILL.md .claude/skills/amanah-blueprint/SKILL.md
-
 cp .amanah/AGENT.md .claude/agents/amanah-blueprint-generator.agent.md
+
+# Atlas generator skill
+mkdir -p .claude/skills/amanah-atlas-generator
+cp .amanah/atlas-generator/SKILL.md .claude/skills/amanah-atlas-generator/SKILL.md
 ```
 
-**Step 3** — Add to your project's `CLAUDE.md`:
+**Step 3** — Generate your atlas (auto-scan your codebase):
+
+```
+# In Claude Code, just say:
+generate atlas for this project
+```
+
+The atlas generator scans your code and fills in all 5 context maps automatically. Or edit `.amanah/atlas/*.md` manually if you prefer.
+
+**Step 4** — Add to your project's `CLAUDE.md`:
 
 ```markdown
 ## Feature Blueprints
@@ -150,7 +279,7 @@ Blueprints live in `.amanah/blueprints/{feature-name}/`:
 **Always read these before modifying code for a feature.**
 ```
 
-**Step 4** — Start using it:
+**Step 5** — Start using it:
 
 ```
 create blueprint for user-authentication
@@ -968,12 +1097,21 @@ The skill auto-detects and can escalate from Lite to Full if the bug turns out t
 
 ```
 .amanah/
-├── README.md      This guide
-├── LICENSE         MIT
-├── .gitignore      Ignores generated blueprints/
-├── SKILL.md        Skill template (what/how/now + fix.md templates, rules, validation)
-├── AGENT.md        Agent template (research process, generation instructions)
-└── blueprints/     Generated blueprints (project-specific, gitignored)
+├── README.md           This guide
+├── LICENSE              MIT
+├── .gitignore           Ignores generated blueprints/
+├── SKILL.md             Blueprint skill template (v5.0.0 — atlas-aware + lite mode)
+├── AGENT.md             Blueprint agent template (v5.0.0 — atlas-aware research phase)
+├── atlas-generator/     Atlas generator skill (auto-generates atlas from codebase)
+│   └── SKILL.md
+├── atlas/               Project context maps (5 core templates + custom maps)
+│   ├── product.md
+│   ├── tech.md
+│   ├── structure.md
+│   ├── conventions.md
+│   ├── quickstart.md
+│   └── {custom}.md      Optional: subsystem deep dives
+└── blueprints/          Generated blueprints (project-specific, gitignored)
     └── {name}/
         ├── what.md
         ├── how.md

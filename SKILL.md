@@ -1,12 +1,30 @@
 ---
 name: amanah-blueprint
 description: Use for blueprint, create blueprint, plan feature, spec for X, what/how/now docs, feature planning, blueprint for X, fix bug X, hotfix, bug analysis, investigate. Generates implementation-ready feature blueprints (what/how/now) or bug fix plans (fix.md).
-version: 4.0.0
+version: 5.0.0
 ---
 
 # Amanah Blueprint Generator
 
 Generates implementation-ready specs in `.amanah/blueprints/{feature-name}/`. Supports two modes: **Full** for new features, **Lite** for bug fixes and small changes.
+
+## Atlas (Project Context Maps)
+
+Before generating blueprints, the skill reads **atlas files** from `.amanah/atlas/` — persistent project context that tells the generator about your codebase.
+
+| Map | Purpose | Read For |
+|-----|---------|----------|
+| `product.md` | What the product is, core concepts, user roles | Domain-aware requirements |
+| `tech.md` | Stack, libraries, databases, external services | Stack-correct code examples |
+| `structure.md` | Directory layout, code patterns, file locations | File-path-correct specs |
+| `conventions.md` | Coding rules, gotchas, naming patterns | Convention-compliant output |
+| `quickstart.md` | Copy-paste recipes for common tasks | Consistent action items |
+
+**If `.amanah/atlas/` exists**, the generator reads all `.md` files during research phase before generating any blueprint. This produces specs that use your project's actual imports, patterns, and file paths.
+
+**If `.amanah/atlas/` does not exist**, the generator falls back to reading `CLAUDE.md` and `README.md` for project context.
+
+**To set up atlas**: Copy the template files from `.amanah/atlas/` and fill in your project's details. See `README.md` for details.
 
 ## When to Use
 
@@ -73,11 +91,12 @@ Step 5: Validate all three files
 
 Before generating anything, gather:
 
-1. **Which project?** — Detect the tech stack from the current working directory and any CLAUDE.md / README files
-2. **Read project conventions** — Look for CLAUDE.md, README, CONTRIBUTING.md, or similar docs that define patterns
-3. **Search existing code** — Find related services, models, routers, components that this feature touches
-4. **Check existing blueprints** — Look in `.amanah/blueprints/` for similar features to follow the same pattern
-5. **Ask the user** — If the feature scope is unclear, ask for: target users, core use cases, constraints
+1. **Read atlas files** — If `.amanah/atlas/` exists, read ALL `.md` files in it. These provide project context: product domain, tech stack, code patterns, conventions, and quickstart recipes. This is the primary source of project knowledge.
+2. **Detect stack** — If no atlas exists, detect the tech stack from CLAUDE.md, README.md, package.json, requirements.txt, or similar files
+3. **Read project conventions** — If no atlas exists, look for CLAUDE.md, README, CONTRIBUTING.md for patterns
+4. **Search existing code** — Find related services, models, routers, components that this feature touches
+5. **Check existing blueprints** — Look in `.amanah/blueprints/` for similar features to follow the same pattern
+6. **Ask the user** — If the feature scope is unclear, ask for: target users, core use cases, constraints
 
 ## Step 2: Generate what.md
 

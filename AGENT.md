@@ -37,18 +37,34 @@ If unclear, ask the user. If during Lite Mode investigation the bug is systemic 
 
 **IMPORTANT: Generate one file at a time. STOP after each file and wait for user confirmation before proceeding.**
 
-### 1. Detect Stack
+### 1. Read Atlas (Project Context Maps)
 
-Check CWD and project files to determine the tech stack. Look for:
+**First thing — always.** Check if `.amanah/atlas/` exists. If it does, read ALL `.md` files in it:
+
+| File | What It Provides |
+|------|-----------------|
+| `product.md` | Product domain, core concepts, user roles, business model |
+| `tech.md` | Stack, libraries, databases, external services, dev commands |
+| `structure.md` | Directory layout, code patterns, file locations |
+| `conventions.md` | Coding rules, gotchas, naming patterns, do's/don'ts |
+| `quickstart.md` | Copy-paste recipes for common tasks |
+
+Atlas is the primary source of project knowledge. Blueprints generated with atlas use the project's actual imports, patterns, file paths, and conventions.
+
+**If atlas does not exist**, fall back to reading `CLAUDE.md`, `README.md`, `package.json`, `requirements.txt`, etc.
+
+### 2. Detect Stack
+
+If atlas doesn't exist, check CWD and project files to determine the tech stack. Look for:
 - `CLAUDE.md`, `README.md`, `package.json`, `requirements.txt`, `go.mod`, etc.
 - Existing directory structure (e.g., `src/`, `api/`, `app/`)
 - Framework indicators (Next.js, Django, FastAPI, Express, Spring Boot, etc.)
 
-### 2. Research Phase
+### 3. Research Phase
 
 **Always do this first.** Do NOT skip to generation.
 
-1. Read project conventions (CLAUDE.md, README, CONTRIBUTING.md, etc.)
+1. Atlas files (or fallback to CLAUDE.md, README, CONTRIBUTING.md) have already been read in Step 1
 2. Search for related existing code:
    - Similar services/modules (`grep` for related class/function names)
    - Similar data models (`grep` for related table/type names)
@@ -57,10 +73,10 @@ Check CWD and project files to determine the tech stack. Look for:
 3. Check `.amanah/blueprints/` for existing specs — follow the same structure and depth
 4. Understand existing schema, relationships, constraints
 
-### 3. Generate what.md — WHAT the feature must do
+### 4. Generate what.md — WHAT the feature must do
 
 **After generating what.md, STOP. Ask user: "what.md is ready. Review it — any revisions before I proceed to how.md?"**
-**Only continue to step 4 after user confirms.**
+**Only continue to step 5 after user confirms.**
 
 Structure:
 1. **Overview** — 1-2 paragraphs explaining what and why
@@ -95,10 +111,10 @@ Structure:
 9. **Depends On** — Internal and external dependencies
 10. **Revision Log** — Table: `Date | What Changed | Why` — initialized with creation date on first generation
 
-### 4. Generate how.md — HOW it's implemented
+### 5. Generate how.md — HOW it's implemented
 
 **Only after user confirms what.md. After generating how.md, STOP. Ask user: "how.md is ready. Review it — any revisions before I proceed to now.md?"**
-**Only continue to step 5 after user confirms.**
+**Only continue to step 6 after user confirms.**
 
 Structure:
 1. **Overview** — Summary + "Key Design Decisions" with 3-5 bullets explaining WHY
@@ -136,7 +152,7 @@ Structure:
    - Unit Tests (specific test cases)
    - Integration Tests (end-to-end scenarios)
 
-### 5. Generate now.md — WHAT TO DO NOW (implementation checklist)
+### 6. Generate now.md — WHAT TO DO NOW (implementation checklist)
 
 **Only after user confirms how.md. After generating now.md, STOP. Ask user: "now.md is ready. Review it — any final revisions?"**
 
@@ -150,7 +166,7 @@ Structure:
 3. **Notes** — Important constraints, ordering, gotchas
 4. **Dependency Graph** — JSON waves format at the bottom
 
-### 6. Validation
+### 7. Validation
 
 Before finishing, verify:
 - [ ] Every action item references at least one must-have (M-X)
@@ -253,12 +269,14 @@ For bug fixes, hotfixes, investigations, and small changes. Generates a single `
 
 ### Lite Process
 
-**Step 1: Investigate**
+**Step 1: Read Atlas + Investigate**
 
-1. Read the bug report — understand symptoms, reproduction, error messages
-2. Find root cause in code — `grep` for error messages, function names, trace data flow
-3. Identify the minimal fix needed
-4. Check for same pattern elsewhere (could the same bug exist in other places?)
+1. Read `.amanah/atlas/*.md` if it exists — provides project context, conventions, gotchas
+2. Read the bug report — understand symptoms, reproduction, error messages
+3. Find root cause in code — `grep` for error messages, function names, trace data flow
+4. Identify the minimal fix needed
+5. Check for same pattern elsewhere (could the same bug exist in other places?)
+6. Check `conventions.md` (from atlas) for relevant gotchas that the fix must respect
 
 **Step 2: Generate fix.md → STOP → Ask user to confirm**
 
