@@ -626,3 +626,42 @@ Step 3: Validate fix.md
 - **Lite Mode: root cause must be specific** — not "the code is wrong" but "video_generation_service.py:895 uses `-shortest` flag which truncates audio at 8s when TTS generates 8.3s audio"
 - **Lite Mode: edge cases ≥ 3** — every fix.md must have at least 3 edge cases. Bug fixes often introduce new bugs; edge cases catch them early.
 - **Lite Mode: regression test required** — every fix.md must include at least 1 regression test verifying existing behavior still works after the fix
+
+## Token Optimization
+
+Blueprints can be token-heavy. Follow these rules to minimize cost:
+
+### Atlas Read Rules
+
+- **Only read relevant atlas files** — skip `product.md` and `quickstart.md` for pure infrastructure/database changes. Read only what's needed for the feature.
+- **Keep atlas files under 120 lines each** — dense, useful, no fluff. 5 files × 80-120 lines = ~2K tokens total.
+- **Don't re-read atlas mid-session** — atlas stays in context after first read. Multiple blueprints in one session share the same atlas read.
+
+### Mode Selection Rules
+
+- **Use Lite Mode aggressively** — if the feature touches ≤5 files, use fix.md instead of full what/how/now. Saves ~20K tokens per blueprint.
+- **Auto-suggest Lite Mode** — if during research the feature turns out to be small (≤3 files, single component), suggest switching to Lite Mode.
+
+### Generation Rules
+
+- **Skip sequential reviews for small features** — if user says "just generate all" or feature is simple, generate all 3 files without STOP between each. Saves ~3-5K tokens.
+- **Targeted updates, not full regeneration** — when user requests changes, edit only the affected section. Don't regenerate the entire file.
+- **Batch blueprints in one session** — generating multiple blueprints in one session shares the atlas context. ~5K savings per additional blueprint.
+
+### Estimated Token Cost
+
+| Task | Tokens | Mode |
+|------|--------|------|
+| 1 Lite fix (fix.md) | ~5-8K | Lite |
+| 1 Full blueprint (what+how+now) | ~20-30K | Full |
+| 2 Full blueprints (batched) | ~40K | Full, same session |
+| 1 Full + 2 Lite (batched) | ~35K | Mixed, same session |
+| Atlas regeneration | ~15K | Full project scan |
+
+### Quick Wins (Biggest Impact)
+
+1. **Keep atlas short** — saves 3-4K per blueprint (biggest lever)
+2. **Use Lite Mode for ≤5 file changes** — saves 20K per blueprint
+3. **Batch blueprints in one session** — saves 5K atlas reads per additional blueprint
+4. **Targeted updates** instead of full regen — saves 15K
+5. **Skip reviews for small features** — saves 3-5K

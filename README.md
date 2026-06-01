@@ -1039,6 +1039,65 @@ PROGRESS: 3/12 done
 
 ---
 
+## Token Optimization
+
+Blueprints can be token-heavy. Here's how to minimize cost without sacrificing quality.
+
+### Estimated Token Cost
+
+| Task | Tokens | When |
+|------|--------|------|
+| 1 Lite fix (fix.md) | ~5-8K | Bug fix, small change |
+| 1 Full blueprint (what+how+now) | ~20-30K | New feature |
+| 2 Full blueprints (batched) | ~40K | Multiple features, same session |
+| 1 Full + 2 Lite (batched) | ~35K | Mixed, same session |
+| Atlas regeneration | ~15K | First-time setup |
+
+### Quick Wins (Biggest Impact)
+
+| Tip | Savings | How |
+|-----|---------|-----|
+| **Keep atlas files short** (<120 lines each) | ~3-4K per blueprint | Dense, useful, no fluff |
+| **Use Lite Mode for ≤5 file changes** | ~20K per blueprint | `fix.md` instead of full what/how/now |
+| **Batch blueprints in one session** | ~5K per additional blueprint | Atlas stays in context, no re-read |
+| **Targeted updates** instead of full regen | ~15K | Edit affected section only |
+| **Skip reviews for small features** | ~3-5K | `"generate all 3, skip reviews"` |
+
+### Atlas Optimization
+
+```mermaid
+graph LR
+    A[5 atlas files<br/>300 lines each] -->|"<br/>6K tokens per read"| B[Expensive]
+    C[5 atlas files<br/>100 lines each] -->|"<br/>2K tokens per read"| C2[Efficient]
+
+    style A fill:#E74C3C,color:#fff
+    style B fill:#E74C3C,color:#fff
+    style C fill:#2ECC71,color:#fff
+    style C2 fill:#2ECC71,color:#fff
+```
+
+**Rules:**
+- Each atlas file should be **80-120 lines** — dense, no filler
+- Generator only reads **relevant atlas files** (skip `product.md` for pure DB changes)
+- Atlas stays in context **within a session** — multiple blueprints share the same read
+
+### Batch Blueprints
+
+```
+❌ EXPENSIVE: New session for each blueprint
+Session 1: create blueprint for feature-A  → reads atlas (5K)
+Session 2: create blueprint for feature-B  → reads atlas (5K again)
+Session 3: create blueprint for feature-C  → reads atlas (5K again)
+                                         Total atlas reads: 15K tokens
+
+✅ EFFICIENT: Multiple blueprints in one session
+Session 1: create blueprint for A, then B, then C
+                                         Total atlas reads: 5K tokens
+                                         Savings: 10K tokens
+```
+
+---
+
 ## FAQ
 
 <details>
