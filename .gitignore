@@ -1,0 +1,13 @@
+# Keep generated blueprints local (project-specific)
+blueprints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
