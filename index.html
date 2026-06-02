@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Implementation-ready feature blueprints and bug fix plans for Claude Code. Enforced quality gates — edge cases, correctness properties, security checks — traced end-to-end." />
+  <meta name="keywords" content="Claude Code, blueprints, specs, feature planning, AI coding, slash commands, mermaid diagrams" />
+  <meta name="author" content="Nurul Hadi" />
+  <meta name="theme-color" content="#09090b" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Amanah Blueprint — Specs that ship without revisions" />
+  <meta property="og:description" content="Implementation-ready feature blueprints and bug fix plans for Claude Code. 29 quality gates enforced." />
+  <meta property="og:url" content="https://amanah-blueprint.vercel.app" />
+
+  <title>Amanah Blueprint — Specs that ship without revisions</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.6s ease-out forwards',
+            'slide-up': 'slideUp 0.6s ease-out forwards',
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'gradient': 'gradient 8s linear infinite',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: 0 },
+              '100%': { opacity: 1 },
+            },
+            slideUp: {
+              '0%': { opacity: 0, transform: 'translateY(20px)' },
+              '100%': { opacity: 1, transform: 'translateY(0)' },
+            },
+            gradient: {
+              '0%': { backgroundPosition: '0% 50%' },
+              '50%': { backgroundPosition: '100% 50%' },
+              '100%': { backgroundPosition: '0% 50%' },
+            },
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Mermaid.js -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        darkMode: true,
+        background: '#09090b',
+        primaryColor: '#18181b',
+        primaryTextColor: '#f4f4f5',
+        primaryBorderColor: '#34d399',
+        lineColor: '#52525b',
+        secondaryColor: '#27272a',
+        tertiaryColor: '#18181b',
+        nodeBorder: '#34d399',
+        mainBkg: '#18181b',
+        secondBkg: '#27272a',
+        edgeLabelBackground: '#09090b',
+        fontFamily: 'JetBrains Mono, monospace',
+        fontSize: '13px',
+      },
+      flowchart: { curve: 'basis', padding: 20, nodeSpacing: 40, rankSpacing: 40 },
+      sequence: { actorMargin: 50, boxMargin: 10 },
+    });
+    window.mermaidReady = true;
+  </script>
+
+  <!-- Prism.js for syntax highlighting -->
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2309090b'/%3E%3Cpath d='M30 70V30h40v8H38v10h28v8H38v14z' fill='%2334d399'/%3E%3C/svg%3E" type="image/svg+xml" />
+
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; background: #09090b; color: #f4f4f5; }
+    code, pre, .font-mono { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+
+    /* Hero glow */
+    .hero-glow::before {
+      content: '';
+      position: absolute;
+      top: -30%; left: 50%;
+      transform: translateX(-50%);
+      width: 900px; height: 700px;
+      background: radial-gradient(ellipse at center, rgba(52, 211, 153, 0.18), rgba(52, 211, 153, 0.05) 40%, transparent 70%);
+      filter: blur(60px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Animated gradient border for hero CTA */
+    @property --angle {
+      syntax: '<angle>';
+      initial-value: 0deg;
+      inherits: false;
+    }
+    .gradient-border-wrap {
+      position: relative;
+      background: #09090b;
+      border-radius: 12px;
+    }
+    .gradient-border-wrap::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 14px;
+      background: conic-gradient(from var(--angle), transparent 70%, #34d399 85%, transparent 100%);
+      animation: rotate-border 4s linear infinite;
+      z-index: -1;
+    }
+    @keyframes rotate-border {
+      to { --angle: 360deg; }
+    }
+
+    /* Terminal */
+    .terminal-body {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .terminal-line { opacity: 0; animation: typeIn 0.3s ease-out forwards; }
+    @keyframes typeIn {
+      from { opacity: 0; transform: translateX(-8px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .cursor-blink::after {
+      content: '▊';
+      color: #34d399;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    /* Code block copy hover */
+    .code-block:hover .copy-hint { opacity: 1; }
+    .copy-hint { opacity: 0; transition: opacity 0.2s; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #09090b; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+    ::selection { background: rgba(52, 211, 153, 0.3); color: #f4f4f5; }
+
+    /* Scroll reveal */
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* Mermaid */
+    .mermaid { display: flex; justify-content: center; padding: 8px 0; }
+    .mermaid svg { max-width: 100%; height: auto; }
+
+    /* Prism overrides */
+    pre[class*="language-"] {
+      background: #09090b !important;
+      border: 1px solid #27272a;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.7;
+      margin: 0;
+      padding: 16px !important;
+    }
+    code[class*="language-"] { font-family: 'JetBrains Mono', monospace !important; }
+
+    /* Tab system */
+    .tab-btn { transition: all 0.2s; }
+    .tab-btn.active {
+      color: #34d399;
+      border-bottom-color: #34d399;
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.3s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* Glow text */
+    .glow-text { text-shadow: 0 0 30px rgba(52, 211, 153, 0.5); }
+
+    /* Animated gradient text */
+    .gradient-text {
+      background: linear-gradient(135deg, #34d399, #6ee7b7, #34d399, #a7f3d0);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradient 4s ease infinite;
+    }
+
+    /* Card glow on hover */
+    .card-glow { transition: all 0.3s; }
+    .card-glow:hover {
+      border-color: rgba(52, 211, 153, 0.3);
+      box-shadow: 0 0 30px rgba(52, 211, 153, 0.08);
+    }
+
+    /* Quality gate category */
+    details summary::-webkit-details-marker { display: none; }
+    details summary { list-style: none; }
+    details[open] .chevron { transform: rotate(180deg); }
+    .chevron { transition: transform 0.2s; }
+  </style>
+</head>
+<body class="antialiased">
+
+<!-- ============ NAV BAR ============ -->
+<nav class="sticky top-0 z-50 border-b border-zinc-900 bg-zinc-950/80 backdrop-blur-xl">
+  <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-6">
+    <a href="#" class="flex items-center gap-2">
+      <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 ring-1 ring-emerald-500/30">
+        <span class="font-mono text-sm font-bold text-emerald-400">A</span>
+      </div>
+      <span class="font-mono text-sm font-semibold tracking-tight text-zinc-100">amanah-blueprint</span>
+    </a>
+    <div class="flex items-center gap-3 md:gap-6">
+      <a href="#features" class="hidden text-sm text-zinc-400 transition hover:text-zinc-100 sm:inline">Features</a>
+      <a href="#how-it-works" class="hidden text-sm text-zinc-400 transition hover:text-zinc-100 sm:inline">How</a>
+      <a href="#preview" class="hidden text-sm text-zinc-400 transition hover:text-zinc-100 md:inline">Preview</a>
+      <a href="#commands" class="hidden text-sm text-zinc-400 transition hover:text-zinc-100 md:inline">Commands</a>
+      <a href="#faq" class="hidden text-sm text-zinc-400 transition hover:text-zinc-100 md:inline">FAQ</a>
+      <a href="https://github.com/NHadi/AmanahAgent.Blueprint.Skills" target="_blank" rel="noopener" class="text-sm text-zinc-400 transition hover:text-zinc-100">
+        <svg class="inline-block h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+      </a>
+      <a href="#quick-start" class="rounded-md bg-emerald-500/10 px-3 py-1.5 text-sm font-medium text-emerald-400 ring-1 ring-emerald-500/30 transition hover:bg-emerald-500/20 hover:ring-emerald-500/50">
+        Get Started <span class="hidden sm:inline">&rarr;</span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<section class="hero-glow relative overflow-hidden">
+  <div class="relative z-10 mx-auto max-w-6xl px-4 py-20 md:px-6 md:py-28">
+    <div class="mx-auto max-w-3xl text-center">
+      <!-- Eyebrow badge -->
+      <a href="https://www.npmjs.com/package/amanah-blueprint" target="_blank" rel="noopener" class="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/50 px-3 py-1 text-xs font-medium text-zinc-400 transition hover:border-zinc-700 hover:text-zinc-200">
+        <span class="relative flex h-1.5 w-1.5">
+          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+        </span>
+        v5.1.0 &mdash; now on npm
+      </a>
+
+      <!-- Headline -->
+      <h1 class="mt-6 text-5xl font-bold tracking-tight text-zinc-50 sm:text-6xl md:text-7xl">
+        Specs that ship <span class="gradient-text">without revisions</span>.
+      </h1>
+
+      <!-- Subheadline -->
+      <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-zinc-400">
+        Implementation-ready feature blueprints and bug fix plans for Claude Code.
+        Enforced quality gates &mdash; edge cases, correctness properties, security checks &mdash;
+        traced end-to-end.
+      </p>
+
+      <!-- Install command -->
+      <div class="mx-auto mt-8 max-w-md">
+        <div class="gradient-border-wrap">
+          <div class="code-block group relative overflow-hidden rounded-lg bg-zinc-950">
+            <div class="flex items-center justify-between border-b border-zinc-800 px-4 py-2">
+              <span class="text-xs text-zinc-500">Install</span>
+              <button onclick="copyCode(this, 'npx amanah-blueprint')" class="copy-hint flex items-center gap-1 text-xs text-zinc-500 transition hover:text-zinc-300">
+                <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre class="px-4 py-3 text-sm"><code class="text-zinc-300">$ <span class="text-emerald-400">npx</span> amanah-blueprint</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+        <a href="#quick-start" class="w-full rounded-md bg-emerald-500 px-6 py-3 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400 sm:w-auto">
+          Get Started &rarr;
+        </a>
+        <a href="https://github.com/NHadi/AmanahAgent.Blueprint.Skills" target="_blank" rel="noopener" class="w-full rounded-md border border-zinc-800 bg-zinc-900 px-6 py-3 text-sm font-semibold text-zinc-300 transition hover:border-zinc-700 hover:text-zinc-100 sm:w-auto">
+          View on GitHub
+        </a>
+      </div>
+
+      <!-- Live stats row -->
+      <div class="mt-10 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+        <img src="https://img.shields.io/npm/v/amanah-blueprint?color=34d399&label=npm&style=for-the-badge&logo=npm" alt="npm version" />
+        <img src="https://img.shields.io/npm/dw/amanah-blueprint?color=34d399&label=downloads&style=for-the-badge" alt="npm downloads" />
+        <img src="https://img.shields.io/github/stars/NHadi/AmanahAgent.Blueprint.Skills?color=34d399&label=stars&style=for-the-badge&logo=github" alt="GitHub stars" />
+        <img src="https://img.shields.io/badge/license-MIT-34d399?style=for-the-badge" alt="license" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ANIMATED TERMINAL ============ -->
+<section class="border-t border-zinc-900">
+  <div class="mx-auto max-w-6xl px-4 py-16 md:px-6">
+    <div class="mx-auto max-w-2xl text-center reveal">
+      <p class="text-sm font-medium text-emerald-400">See it in action</p>
+      <h2 class="mt-2 text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl">
+        From install to blueprint in 60 seconds.
+      </h2>
+    </div>
+
+    <div class="mx-auto mt-10 max-w-3xl reveal">
+      <div class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 shadow-2xl shadow-emerald-500/5">
+        <!-- Terminal header -->
+        <div class="flex items-center gap-2 border-b border-zinc-800 bg-zinc-900/50 px-4 py-2.5">
+          <span class="h-3 w-3 rounded-full bg-red-500/80"></span>
+          <span class="h-3 w-3 rounded-full bg-yellow-500/80"></span>
+          <span class="h-3 w-3 rounded-full bg-green-500/80"></span>
+          <span class="ml-3 font-mono text-xs text-zinc-500">amanah-blueprint &mdash; bash</span>
+          <button onclick="startTerminal()" class="ml-auto text-xs text-zinc-500 transition hover:text-emerald-400">
+            <span class="cursor-pointer">&#x21bb; replay</span>
+          </button>
+        </div>
+        <!-- Terminal body -->
+        <div id="terminal" class="terminal-body min-h-[340px] p-6">
+          <!-- Lines injected by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROBLEM SECTION ============ -->
+<section class="border-t border-zinc-900">
+  <div class="mx-auto max-w-6xl px-4 py-20 md:px-6">
+    <div class="mx-auto max-w-2xl text-center reveal">
+      <h2 class="text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl">
+        Every team has the same problem.
+      </h2>
+      <p class="mt-4 text-lg text-zinc-400">
+        You describe a feature to an AI (or a developer). They build something. It's 80% right.
+        Missing edge cases. Vague error handling. No tests for the tricky parts.
+      </p>
+    </div>
+
+    <div class="mx-auto mt-12 grid max-w-4xl gap-4 md:grid-cols-2">
+      <div class="reveal rounded-lg border border-zinc-800 bg-zinc-900/50 p-6 card-glow">
+        <div class="mb-4 inline-flex items-center gap-2 rounded-md bg-red-500/10 px-2.5 py-1 text-xs font-medium text-red-400 ring-1 ring-red-500/20">
+          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          Without Blueprint
+        </div>
+        <ul class="space-y-3 text-sm text-zinc-400">
+          <li class="flex gap-2"><span class="text-zinc-600">&mdash;</span> AI writes plans from memory</li>
+          <li class="flex gap-2"><span class="text-zinc-600">&mdash;</span> "Handle errors gracefully"</li>
+          <li class="flex gap-2"><span class="text-zinc-600">&mdash;</span> No edge cases identified</li>
+          <li class="flex gap-2"><span class="text-zinc-600">&mdash;</span> "Write tests" (no strategy)</li>
+          <li class="flex gap-2"><span class="text-zinc-600">&mdash;</span> Hope it works in production</li>
+        </ul>
+      </div>
+
+      <div class="reveal rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-6 card-glow">
+        <div class="mb-4 inline-flex items-center gap-2 rounded-md bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-400 ring-1 ring-emerald-500/30">
+          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          With Blueprint
+        </div>
+        <ul class="space-y-3 text-sm text-zinc-300">
+          <li class="flex gap-2"><span class="text-emerald-400">+</span> AI reads your code first</li>
+          <li class="flex gap-2"><span class="text-emerald-400">+</span> Error table: scenario, HTTP code, response, recovery</li>
+          <li class="flex gap-2"><span class="text-emerald-400">+</span> 5-10 edge cases with exact behavior</li>
+          <li class="flex gap-2"><span class="text-emerald-400">+</span> Property-based + unit + integration strategy</li>
+          <li class="flex gap-2"><span class="text-emerald-400">+</span> 29 quality gates enforced on every spec</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURES GRID ============ -->
+<section id="features" class="border-t border-zinc-900">
+  <div class="mx-auto max-w-6xl px-4 py-20 md:px-6">
+    <div class="mx-auto max-w-2xl text-center reveal">
+      <p class="text-sm font-medium text-emerald-400">Features</p>
+      <h2 class="mt-2 text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl">
+        What makes specs implementation-ready.
+      </h2>
+    </div>
+
+    <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="reveal rounded-lg border border-zinc-800 bg-zinc-900/50 p-6 card-glow">
+        <div class="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10 ring-1 ring-emerald-500/20">
+          <svg class="h-5 w-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        </div>
+        <h3 class="font-semibold text-zinc-100">Formal Acceptance Criteria</h3>
+        <p class="mt-2 text-sm leading-relaxed text-zinc-400">
+          WHEN/IF/THEN SHALL language with concrete input/output examples for every criterion.
+        </p>
+      </div>
+
+      <div class="reveal rounded-lg border border-zinc-800 bg-zinc-900/50 p-6 card-glow">
+        <div class="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10 ring-1 ring-emerald-500/20">
+          <svg class="h-5 w-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <h3 class="font-semibold text-zinc-100">Edge Case Enumeration</h3>
+        <p class="mt-2 text-sm leading-relaxed text-zinc-400">
+          Minimum 5 per feature with exact expected behavior, traced to correctness properties and tests.
+        </p>
+      </div>
+
+      <div class="reveal rounded-lg border border-zinc-800 bg-zinc-900/50 p-6 card-glow">
+        <div class="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10 ring-1 ring-emerald-500/20">
+          <svg class="h-5 w-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3 class="font-semibold text-zinc-100">Correctness Properties</h3>
+        <p class="mt-2 text-sm leading-relaxed text-zinc-400">
+          Formal statements bridging requirements and tests. Every property validates at least one must-have.
+        </p>
+      </div>
+
+      <div class="reveal rounded-lg border border-zinc-800 bg-zinc-900/50 p-6 card-glow">
+        <div class="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10 ring-1 ring-emerald-500/20">
+          <svg class="h-5 w-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+        </div>
+        <h3 class="font-semibold text-zinc-100">Code Reuse First</h3>
+        <p class="mt-2 text-sm leading-relaxed text-zinc-400">
+          Existing services, utilities, and models identified before designing new components. Reuse before build.
+        </p>
+      </div>
+
+      <div class="reveal rounded-lg border border-zinc-800 bg-zinc-900/50 p-6 card-glow">
+        <div class="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10 ring-1 ring-emerald-500/20">
+          <svg class="h-5 w-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        </div>
+        <h3 class="font-semibold text-zinc-100">29 Quality Gates</h3>
+        <p class="mt-2 text-sm leading-relaxed text-zinc-400">
+          Security, performance, traceability, and code quality checks enforced on every blueprint before finalizing.
+        </p>
+      </div>
+
+      <div class="reveal rounded-lg border border-zinc-800 bg-zinc-900/50 p-6 card-glow">
+        <div class="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10 ring-1 ring-emerald-500/20">
+          <svg class="h-5 w-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        </div>
+        <h3 class="font-semibold text-zinc-100">Auto Progress Tracking</h3>
+        <p class="mt-2 text-sm leading-relaxed text-zinc-400">
+          <code class="rounded bg-zinc-800 px-1.5 py-0.5 text-xs text-emerald-400">- [x]</code> marks in now.md.
+          Resume after interrupt. Audit trail built in.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS + MERMAID ============ -->
+<section id="how-it-works" class="border-t border-zinc-900">
+  <div class="mx-auto max-w-6xl px-4 py-20 md:px-6">
+    <div class="mx-auto max-w-2xl text-center reveal">
+      <p class="text-sm font-medium text-emerald-400">How It Works</p>
+      <h2 class="mt-2 text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl">
+        Sequential workflow with built-in review.
+      </h2>
+      <p class="mt-4 text-zinc-400">
+        One file at a time, with user review between each step. Errors caught early don't compound.
+      </p>
+    </div>
+
+    <!-- Mermaid Diagram 1 -->
+    <div class="mx-auto mt-12 max-w-3xl reveal rounded-lg border border-zinc-800 bg-zinc-900/50 p-8 card-glow">
+      <pre class="mermaid">
+flowchart LR
+    A["Research<br/>Codebase"] --> B["what.md<br/>Requirements"]
+    B --> C["how.md<br/>Design"]
+    C --> D["now.md<br/>Action Items"]
+    D --> E["Implement"]
+
+    style A fill:#18181b,stroke:#71717a,stroke-width:2px,color:#f4f4f5
+    style B fill:#18181b,stroke:#34d399,stroke-width:2px,color:#f4f4f5
+    style C fill:#18181b,stroke:#34d399,stroke-width:2px,color:#f4f4f5
+    style D fill:#18181b,stroke:#34d399,stroke-width:2px,color:#f4f4f5
+    style E fill:#18181b,stroke:#f59e0b,stroke-width:2px,color:#f4f4f5
+      </pre>
+    </div>
+
+    <!-- 3 Steps -->
+    <div class="mx-auto mt-8 max-w-4xl">
+      <div class="grid gap-4 md:grid-cols-3">
+        <div class="reveal relative rounded-lg border border-zinc-800 bg-zinc-900/50 p-6 card-glow">
+          <div class="absolute -top-3 left-6 rounded-full border border-zinc-800 bg-zinc-950 px-2.5 py-0.5 font-mono text-xs text-emerald-400">01</div>
+          <h3 class="mt-2 font-semibold text-zinc-100">Install</h3>
+          <p class="mt-1 text-sm text-zinc-400">Run in your project directory.</p>
+          <pre class="mt-4 rounded-md border border-zinc-800 bg-zinc-950 p-3 text-xs"><code><span class="text-zinc-500">$</span> <span class="text-emerald-400">npx</span> amanah-blueprint</code></pre>
+        </div>
+
+        <div class="reveal relative rounded-lg border border-zinc-800 bg-zinc-900/50 p-6 card-glow">
+          <div class="absolute -top-3 left-6 rounded-full border border-zinc-800 bg-zinc-950 px-2.5 py-0.5 font-mono text-xs text-emerald-400">02</div>
+          <h3 class="mt-2 font-semibold text-zinc-100">Setup</h3>
+          <p class="mt-1 text-sm text-zinc-400">In Claude Code, generate atlas.</p>
+          <pre class="mt-4 rounded-md border border-zinc-800 bg-zinc-950 p-3 text-xs"><code><span class="text-zinc-500">claude&gt;</span> <span class="text-emerald-400">/setup</span></code></pre>
+        </div>
+
+        <div class="reveal relative rounded-lg border border-zinc-800 bg-zinc-900/50 p-6 card-glow">
+          <div class="absolute -top-3 left-6 rounded-full border border-zinc-800 bg-zinc-950 px-2.5 py-0.5 font-mono text-xs text-emerald-400">03</div>
+          <h3 class="mt-2 font-semibold text-zinc-100">Generate</h3>
+          <p class="mt-1 text-sm text-zinc-400">Create your first blueprint.</p>
+          <pre class="mt-4 rounded-md border border-zinc-800 bg-zinc-950 p-3 text-xs"><code><span class="text-zinc-500">claude&gt;</span> <span class="text-emerald-400">/blueprint</span> my-feature</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ INTERACTIVE BLUEPRINT PREVIEW ============ -->
+<section id="preview" class="border-t border-zinc-900">
+  <div class="mx-auto max-w-6xl px-4 py-20 md:px-6">
+    <div class="mx-auto max-w-2xl text-center reveal">
+      <p class="text-sm font-medium text-emerald-400">See a Blueprint</p>
+      <h2 class="mt-2 text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl">
+        Real spec. Real depth.
+      </h2>
+      <p class="mt-4 text-zinc-400">
+        This is what gets generated for a payment integration feature. Click a tab to switch between files.
+      </p>
+    </div>
+
+    <!-- Tabbed file viewer -->
+    <div class="mx-auto mt-10 max-w-4xl reveal">
+      <div class="overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950 shadow-2xl shadow-emerald-500/5">
+        <!-- File tab bar -->
+        <div class="flex items-center border-b border-zinc-800 bg-zinc-900/50">
+          <div class="flex">
+            <button onclick="switchTab('what')" id="tab-what" class="tab-btn active border-b-2 border-transparent px-4 py-3 text-sm font-mono text-zinc-400 hover:text-zinc-200">
+              what.md
+            </button>
+            <button onclick="switchTab('how')" id="tab-how" class="tab-btn border-b-2 border-transparent px-4 py-3 text-sm font-mono text-zinc-400 hover:text-zinc-200">
+              how.md
+            </button>
+            <button onclick="switchTab('now')" id="tab-now" class="tab-btn border-b-2 border-transparent px-4 py-3 text-sm font-mono text-zinc-400 hover:text-zinc-200">
+              now.md
+            </button>
+          </div>
+          <div class="ml-auto flex items-center gap-2 pr-4 text-xs text-zinc-500">
+            <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            <span class="font-mono">.amanah/blueprints/payment-integration/</span>
+          </div>
+        </div>
+
+        <!-- File contents -->
+        <div class="max-h-[500px] overflow-y-auto">
+
+          <!-- what.md -->
+          <div class="tab-content active" id="content-what">
+<pre><code class="language-markdown"># Credit Billing &mdash; What
+
+## Overview
+Credit-based billing for AI features. Users purchase credits,
+each AI action costs a specific amount.
+
+## Glossary
+- **Credit**: Virtual currency, 1 credit = $0.01
+- **Cost Map**: Lookup table mapping AI actions to credit costs
+
+## Must-Haves
+
+### M-1: Credit Deduction on AI Action
+- **Priority**: P0 (must)
+- **User Story:** As a user, I want to see exactly how many
+  credits each AI action costs before it runs.
+
+#### Acceptance Criteria
+1. WHEN an AI action is requested, THE system SHALL check
+   the user's credit balance against the action's cost.
+   - Example: balance=50, cost=10 &rarr; allow, new balance=40
+
+2. IF balance &lt; cost, THEN THE system SHALL reject with HTTP 402.
+   - Example: balance=3, cost=10 &rarr; HTTP 402
+     {required: 10, current: 3}
+
+## Edge Cases
+| Scenario | Expected Behavior |
+|----------|-------------------|
+| balance = 0 | Block, show purchase prompt |
+| Concurrent requests | Serialize via SELECT FOR UPDATE |
+| Webhook timeout | Don't add credits, log for reconcile |
+| Cost map changes mid-flight | Use cost at request start time |
+</code></pre>
+          </div>
+
+          <!-- how.md -->
+          <div class="tab-content" id="content-how">
+<pre><code class="language-markdown"># Credit Billing &mdash; How
+
+## Overview
+Credit check and deduction via dedicated service layer.
+Uses database row-level locking (SELECT FOR UPDATE).
+
+**Key Design Decisions:**
+- Row-level locking over mutexes (survives crashes)
+- Immutable ledger (balance derived from ledger sum)
+- Cost map cached in Redis (admin updates without deploys)
+
+## Architecture
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant A as API
+    participant S as CreditService
+    participant D as Database
+
+    C-&gt;&gt;A: POST /api/v1/generate-report
+    A-&gt;&gt;S: check_and_deduct(user_id, action)
+    S-&gt;&gt;D: SELECT FOR UPDATE balance
+    D--&gt;&gt;S: balance = 50
+    alt balance &gt;= cost
+        S-&gt;&gt;D: INSERT ledger + UPDATE balance
+        S--&gt;&gt;A: {success: true, balance_after: 40}
+    else balance &lt; cost
+        S--&gt;&gt;A: {success: false, required: 10}
+    end
+```
+
+## Existing Code to Reuse
+| What | File Path | How to Reuse |
+|------|-----------|-------------|
+| StripeWebhookHandler | services/payment/stripe.py | Add credit top-up |
+| UserModel | models/user.py | Add credit_balance |
+
+## Correctness Properties
+
+### Property 1: Balance Never Negative
+*For any* sequence of concurrent deductions, balance SHALL
+never go below 0.
+**Validates: M-1, Q-2**
+</code></pre>
+          </div>
+
+          <!-- now.md -->
+          <div class="tab-content" id="content-now">
+<pre><code class="language-markdown"># Credit Billing &mdash; Now
+
+## Action Items
+
+- [ ] 1. Database: Create ledger table
+  - [ ] 1.1 Create Alembic migration `add_credit_billing`
+    - Add `credit_balance INTEGER DEFAULT 0` to users
+    - Create `credit_ledger` table
+    - _Ref: M-1.3_
+
+- [ ] 2. Checkpoint &mdash; Database ready
+  - Run `alembic upgrade head`
+
+- [ ] 3. Service layer
+  - [ ] 3.1 Create `services/billing/credit_service.py`
+    - `CreditService.check_and_deduct(db, user_id, action)`
+    - Use SELECT FOR UPDATE for row locking
+    - _Ref: M-1.1_
+
+- [ ] 4. Checkpoint &mdash; Service layer ready
+  - Unit test: check_and_deduct() with mock DB
+
+- [ ] 5. API
+  - [ ] 5.1 Add credit check to AI endpoints
+    - _Ref: M-1.1_
+
+- [ ] 6. Tests
+  - [ ] 6.1 Unit tests
+  - [ ] 6.2 Property tests (Hypothesis)
+  - [ ] 6.3 Integration tests
+
+- [ ] 7. Final checkpoint &mdash; All tests pass
+
+## Dependency Graph
+```json
+{
+  "waves": [
+    { "id": 0, "tasks": ["1.1"] },
+    { "id": 1, "tasks": ["3.1"] },
+    { "id": 2, "tasks": ["5.1"] },
+    { "id": 3, "tasks": ["6.1", "6.2", "6.3"] }
+  ]
+}
+```
+</code></pre>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CROSS-REFERENCING + MERMAID ============ -->
+<section class="border-t border-zinc-900">
+  <div class="mx-auto max-w-6xl px-4 py-20 md:px-6">
+    <div class="grid items-center gap-12 lg:grid-cols-2">
+      <div class="reveal">
+        <p class="text-sm font-medium text-emerald-400">Cross-Referencing</p>
+        <h2 class="mt-2 text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl">
+          Nothing is orphaned.
+        </h2>
+        <p class="mt-4 text-lg leading-relaxed text-zinc-400">
+          Every artifact is numbered and linked. Requirements trace to properties,
+          properties trace to tests, edge cases trace through the full chain.
+        </p>
+        <div class="mt-6 space-y-3 text-sm">
+          <div class="flex items-start gap-2 text-zinc-400">
+            <span class="mt-0.5 text-emerald-400">&#x2192;</span>
+            <span><strong class="text-zinc-200">M-1.2</strong> in what.md &rarr; validated by Property 3 in how.md &rarr; tested by Test 5.2 in now.md</span>
+          </div>
+          <div class="flex items-start gap-2 text-zinc-400">
+            <span class="mt-0.5 text-emerald-400">&#x2192;</span>
+            <span>Every edge case has a corresponding property and test</span>
+          </div>
+          <div class="flex items-start gap-2 text-zinc-400">
+            <span class="mt-0.5 text-emerald-400">&#x2192;</span>
+            <span>Function names consistent across all three files</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mermaid Diagram 2 -->
+      <div class="reveal rounded-lg border border-zinc-800 bg-zinc-900/50 p-6 card-glow">
+        <pre class="mermaid">
+graph LR
+    M1["M-1.2<br/>Requirement"] -->|"validated by"| P1["Property 3<br/>Speed-Up Bounded"]
+    E1["Edge Case<br/>TTS 10s audio"] -->|"covered by"| P1
+    P1 -->|"tested by"| T1["Test 5.2<br/>test_speed_factor_bounds"]
+    M1 -->|"traced to"| T1
+
+    style M1 fill:#18181b,stroke:#34d399,stroke-width:2px,color:#f4f4f5
+    style P1 fill:#18181b,stroke:#a78bfa,stroke-width:2px,color:#f4f4f5
+    style E1 fill:#18181b,stroke:#f59e0b,stroke-width:2px,color:#f4f4f5
+    style T1 fill:#18181b,stroke:#34d399,stroke-width:2px,color:#f4f4f5
+        </pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TWO MODES + MERMAID ============ -->
+<section class="border-t border-zinc-900">
+  <div class="mx-auto max-w-6xl px-4 py-20 md:px-6">
+    <div class="mx-auto max-w-2xl text-center reveal">
+      <p class="text-sm font-medium text-emerald-400">Two Modes</p>
+      <h2 class="mt-2 text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl">
+        Right tool for the job.
+      </h2>
+    </div>
+
+    <!-- Mermaid Diagram 3 -->
+    <div class="mx-auto mt-10 max-w-2xl reveal rounded-lg border border-zinc-800 bg-zinc-900/50 p-6 card-glow">
+      <pre class="mermaid">
+flowchart TD
+    A["User Request"] --> B{"Detect Intent"}
+    B -->|"/blueprint, plan feature"| C["Full Mode<br/>what + how + now"]
+    B -->|"/fix, hotfix, why"| D["Lite Mode<br/>fix.md only"]
+
+    style A fill:#18181b,stroke:#71717a,stroke-width:2px,color:#f4f4f5
+    style B fill:#18181b,stroke:#a78bfa,stroke-width:2px,color:#f4f4f5
+    style C fill:#18181b,stroke:#34d399,stroke-width:2px,color:#f4f4f5
+    style D fill:#18181b,stroke:#f59e0b,stroke-width:2px,color:#f4f4f5
+      </pre>
+    </div>
+
+    <div class="mx-auto mt-8 grid max-w-4xl gap-4 md:grid-cols-2">
+      <div class="reveal rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-6 card-glow">
+        <div class="flex items-center justify-between">
+          <h3 class="font-semibold text-zinc-100">Full Mode</h3>
+          <span class="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-400 ring-1 ring-emerald-500/30">Features</span>
+        </div>
+        <p class="mt-2 text-sm text-zinc-400">For new features and multi-component work.</p>
+        <div class="mt-4 space-y-2">
+          <div class="flex items-center gap-2 rounded-md border border-zinc-800 bg-zinc-950/50 px-3 py-2">
+            <span class="font-mono text-xs text-emerald-400">what.md</span>
+            <span class="text-xs text-zinc-500">&mdash; requirements, edge cases, risks</span>
+          </div>
+          <div class="flex items-center gap-2 rounded-md border border-zinc-800 bg-zinc-950/50 px-3 py-2">
+            <span class="font-mono text-xs text-emerald-400">how.md</span>
+            <span class="text-xs text-zinc-500">&mdash; architecture, code, properties</span>
+          </div>
+          <div class="flex items-center gap-2 rounded-md border border-zinc-800 bg-zinc-950/50 px-3 py-2">
+            <span class="font-mono text-xs text-emerald-400">now.md</span>
+            <span class="text-xs text-zinc-500">&mdash; action items, tests, checkpoints</span>
+          </div>
+        </div>
+        <p class="mt-4 text-xs text-zinc-500">Sequential review &mdash; pause after each file.</p>
+      </div>
+
+      <div class="reveal rounded-lg border border-amber-500/20 bg-amber-500/5 p-6 card-glow">
+        <div class="flex items-center justify-between">
+          <h3 class="font-semibold text-zinc-100">Lite Mode</h3>
+          <span class="rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-400 ring-1 ring-amber-500/30">Bug Fixes</span>
+        </div>
+        <p class="mt-2 text-sm text-zinc-400">For bug fixes, hotfixes, and small changes.</p>
+        <div class="mt-4 space-y-2">
+          <div class="flex items-center gap-2 rounded-md border border-zinc-800 bg-zinc-950/50 px-3 py-2">
+            <span class="font-mono text-xs text-amber-400">fix.md</span>
+            <span class="text-xs text-zinc-500">&mdash; everything in one file</span>
+          </div>
+        </div>
+        <div class="mt-4 space-y-1 text-xs text-zinc-500">
+          <p>Root cause &rarr; fix steps &rarr; edge cases &rarr; tests</p>
+          <p>Auto-escalates to Full Mode if &gt;5 files affected.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUALITY GATES CHECKLIST ============ -->
+<section class="border-t border-zinc-900">
+  <div class="mx-auto max-w-6xl px-4 py-20 md:px-6">
+    <div class="mx-auto max-w-2xl text-center reveal">
+      <p class="text-sm font-medium text-emerald-400">Quality Gates</p>
+      <h2 class="mt-2 text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl">
+        29 checks enforced on every blueprint.
+      </h2>
+      <p class="mt-4 text-zinc-400">
+        Click a category to see the individual checks. These run before a blueprint is finalized.
+      </p>
+    </div>
+
+    <div class="mx-auto mt-10 max-w-3xl space-y-3">
+      <!-- Traceability -->
+      <details class="reveal rounded-lg border border-zinc-800 bg-zinc-900/50 card-glow" open>
+        <summary class="flex cursor-pointer items-center justify-between px-6 py-4">
+          <div class="flex items-center gap-3">
+            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 ring-1 ring-emerald-500/20">
+              <svg class="h-4 w-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/></svg>
+            </div>
+            <span class="font-medium text-zinc-100">Traceability</span>
+            <span class="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400">8 checks</span>
+          </div>
+          <svg class="chevron h-4 w-4 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+        <div class="border-t border-zinc-800 px-6 py-4 text-sm text-zinc-400">
+          <ul class="space-y-2">
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> Every action item references at least one must-have (M-N)</li>
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> Every must-have has at least one action item</li>
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> Every Property links to at least one must-have</li>
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> Every Property has a corresponding test in now.md</li>
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> Every edge case has a test in now.md</li>
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> Function name consistency across all files</li>
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> Property-code behavior consistency check</li>
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> Revision Log present in all blueprint files</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- Security -->
+      <details class="reveal rounded-lg border border-zinc-800 bg-zinc-900/50 card-glow">
+        <summary class="flex cursor-pointer items-center justify-between px-6 py-4">
+          <div class="flex items-center gap-3">
+            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-red-500/10 ring-1 ring-red-500/20">
+              <svg class="h-4 w-4 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <span class="font-medium text-zinc-100">Security</span>
+            <span class="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400">7 checks</span>
+          </div>
+          <svg class="chevron h-4 w-4 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+        <div class="border-t border-zinc-800 px-6 py-4 text-sm text-zinc-400">
+          <ul class="space-y-2">
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> SQL injection scan (no string concatenation in queries)</li>
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> Auth dependency on all endpoints</li>
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> Input validation on all user-facing functions</li>
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> No hardcoded secrets or credentials</li>
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> tenant_id isolation on every database query</li>
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> No information leak in error responses</li>
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> Empty input guards at function entry points</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- Performance -->
+      <details class="reveal rounded-lg border border-zinc-800 bg-zinc-900/50 card-glow">
+        <summary class="flex cursor-pointer items-center justify-between px-6 py-4">
+          <div class="flex items-center gap-3">
+            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10 ring-1 ring-amber-500/20">
+              <svg class="h-4 w-4 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </div>
+            <span class="font-medium text-zinc-100">Performance</span>
+            <span class="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400">6 checks</span>
+          </div>
+          <svg class="chevron h-4 w-4 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+        <div class="border-t border-zinc-800 px-6 py-4 text-sm text-zinc-400">
+          <ul class="space-y-2">
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> Database indexes on all non-PK WHERE/ORDER BY/JOIN columns</li>
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> N+1 query detection (no loop-then-query patterns)</li>
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> Long-running tasks (&gt;5s) backgrounded to workers</li>
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> External call timeouts configured explicitly</li>
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> Concurrency protection (SELECT FOR UPDATE / optimistic locking)</li>
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> Pagination on all list endpoints (no unbounded SELECT *)</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- Code Quality -->
+      <details class="reveal rounded-lg border border-zinc-800 bg-zinc-900/50 card-glow">
+        <summary class="flex cursor-pointer items-center justify-between px-6 py-4">
+          <div class="flex items-center gap-3">
+            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/10 ring-1 ring-violet-500/20">
+              <svg class="h-4 w-4 text-violet-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            </div>
+            <span class="font-medium text-zinc-100">Code Quality</span>
+            <span class="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400">5 checks</span>
+          </div>
+          <svg class="chevron h-4 w-4 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+        <div class="border-t border-zinc-800 px-6 py-4 text-sm text-zinc-400">
+          <ul class="space-y-2">
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> No stubbed code (<code># ... same as current ...</code>)</li>
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> No deprecated APIs (e.g., <code>get_event_loop()</code>)</li>
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> No circular imports between components</li>
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> Fallback/error functions fully implemented</li>
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> Python 3.11+ uses <code>asyncio.to_thread()</code></li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- File Integrity -->
+      <details class="reveal rounded-lg border border-zinc-800 bg-zinc-900/50 card-glow">
+        <summary class="flex cursor-pointer items-center justify-between px-6 py-4">
+          <div class="flex items-center gap-3">
+            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-500/10 ring-1 ring-sky-500/20">
+              <svg class="h-4 w-4 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <span class="font-medium text-zinc-100">File Integrity</span>
+            <span class="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400">3 checks</span>
+          </div>
+          <svg class="chevron h-4 w-4 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+        <div class="border-t border-zinc-800 px-6 py-4 text-sm text-zinc-400">
+          <ul class="space-y-2">
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> All file paths verified via grep/glob (no phantom files)</li>
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> "Existing Code to Reuse" paths exist in project</li>
+            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> Conflict detection across other blueprints</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ATLAS SECTION ============ -->
+<section class="border-t border-zinc-900">
+  <div class="mx-auto max-w-6xl px-4 py-20 md:px-6">
+    <div class="grid items-center gap-12 lg:grid-cols-2">
+      <div class="reveal">
+        <p class="text-sm font-medium text-emerald-400">Atlas</p>
+        <h2 class="mt-2 text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl">
+          Project-aware blueprints.
+        </h2>
+        <p class="mt-4 text-lg leading-relaxed text-zinc-400">
+          Atlas is persistent project context &mdash; 5 files that tell the generator about your codebase.
+          Blueprints use your actual imports, file paths, and conventions.
+        </p>
+        <div class="mt-6 grid gap-2 text-sm">
+          <div class="flex items-start gap-2 text-zinc-400">
+            <span class="mt-0.5 text-emerald-400">+</span>
+            <span><strong class="text-zinc-200">With atlas:</strong> Uses your imports, your patterns, your file paths.</span>
+          </div>
+          <div class="flex items-start gap-2 text-zinc-400">
+            <span class="mt-0.5 text-zinc-500">&mdash;</span>
+            <span><strong class="text-zinc-200">Without atlas:</strong> Falls back to CLAUDE.md and README.md.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal rounded-lg border border-zinc-800 bg-zinc-900/50 p-6 card-glow">
+        <div class="mb-4 flex items-center gap-2 text-xs text-zinc-500">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          <span>.amanah/atlas/</span>
+        </div>
+        <div class="space-y-2">
+          <div class="flex items-center justify-between rounded-md border border-zinc-800 bg-zinc-950/50 px-3 py-2.5">
+            <span class="font-mono text-sm text-emerald-400">product.md</span>
+            <span class="text-xs text-zinc-500">Domain, roles, business model</span>
+          </div>
+          <div class="flex items-center justify-between rounded-md border border-zinc-800 bg-zinc-950/50 px-3 py-2.5">
+            <span class="font-mono text-sm text-emerald-400">tech.md</span>
+            <span class="text-xs text-zinc-500">Stack, libraries, services</span>
+          </div>
+          <div class="flex items-center justify-between rounded-md border border-zinc-800 bg-zinc-950/50 px-3 py-2.5">
+            <span class="font-mono text-sm text-emerald-400">structure.md</span>
+            <span class="text-xs text-zinc-500">Directory layout, patterns</span>
+          </div>
+          <div class="flex items-center justify-between rounded-md border border-zinc-800 bg-zinc-950/50 px-3 py-2.5">
+            <span class="font-mono text-sm text-emerald-400">conventions.md</span>
+            <span class="text-xs text-zinc-500">Gotchas, naming rules</span>
+          </div>
+          <div class="flex items-center justify-between rounded-md border border-zinc-800 bg-zinc-950/50 px-3 py-2.5">
+            <span class="font-mono text-sm text-emerald-400">quickstart.md</span>
+            <span class="text-xs text-zinc-500">Copy-paste recipes</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLASH COMMANDS ============ -->
+<section id="commands" class="border-t border-zinc-900">
+  <div class="mx-auto max-w-6xl px-4 py-20 md:px-6">
+    <div class="mx-auto max-w-2xl text-center reveal">
+      <p class="text-sm font-medium text-emerald-400">Slash Commands</p>
+      <h2 class="mt-2 text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl">
+        Five commands. Full control.
+      </h2>
+    </div>
+
+    <div class="mx-auto mt-12 max-w-3xl overflow-hidden rounded-lg border border-zinc-800">
+      <table class="w-full text-sm">
+        <thead class="bg-zinc-900/50">
+          <tr class="border-b border-zinc-800">
+            <th class="px-4 py-3 text-left font-mono text-xs font-medium text-zinc-400">Command</th>
+            <th class="hidden px-4 py-3 text-left text-xs font-medium text-zinc-400 sm:table-cell">Output</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-zinc-400">Purpose</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-zinc-800/50">
+          <tr class="transition hover:bg-zinc-900/30">
+            <td class="px-4 py-3 font-mono text-emerald-400">/setup</td>
+            <td class="hidden px-4 py-3 text-zinc-500 sm:table-cell"><code class="text-xs">atlas/*.md</code></td>
+            <td class="px-4 py-3 text-zinc-300">One-time project initialization</td>
+          </tr>
+          <tr class="transition hover:bg-zinc-900/30">
+            <td class="px-4 py-3 font-mono text-emerald-400">/blueprint &lt;name&gt;</td>
+            <td class="hidden px-4 py-3 text-zinc-500 sm:table-cell"><code class="text-xs">what + how + now</code></td>
+            <td class="px-4 py-3 text-zinc-300">Generate full feature blueprint</td>
+          </tr>
+          <tr class="transition hover:bg-zinc-900/30">
+            <td class="px-4 py-3 font-mono text-amber-400">/fix &lt;name&gt;</td>
+            <td class="hidden px-4 py-3 text-zinc-500 sm:table-cell"><code class="text-xs">fix.md</code></td>
+            <td class="px-4 py-3 text-zinc-300">Generate bug fix plan</td>
+          </tr>
+          <tr class="transition hover:bg-zinc-900/30">
+            <td class="px-4 py-3 font-mono text-zinc-300">/spec &lt;name&gt;</td>
+            <td class="hidden px-4 py-3 text-zinc-500 sm:table-cell"><code class="text-xs">progress</code></td>
+            <td class="px-4 py-3 text-zinc-300">Read existing blueprint + progress</td>
+          </tr>
+          <tr class="transition hover:bg-zinc-900/30">
+            <td class="px-4 py-3 font-mono text-zinc-300">/atlas</td>
+            <td class="hidden px-4 py-3 text-zinc-500 sm:table-cell"><code class="text-xs">atlas/*.md</code></td>
+            <td class="px-4 py-3 text-zinc-300">Regenerate atlas from codebase</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TOKEN OPTIMIZATION ============ -->
+<section class="border-t border-zinc-900">
+  <div class="mx-auto max-w-6xl px-4 py-20 md:px-6">
+    <div class="mx-auto max-w-2xl text-center reveal">
+      <p class="text-sm font-medium text-emerald-400">Token Optimization</p>
+      <h2 class="mt-2 text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl">
+        Built for cost efficiency.
+      </h2>
+      <p class="mt-4 text-zinc-400">
+        Blueprints are token-intensive by nature. The framework includes optimizations to minimize cost.
+      </p>
+    </div>
+
+    <div class="mx-auto mt-12 max-w-3xl overflow-hidden rounded-lg border border-zinc-800">
+      <table class="w-full text-sm">
+        <thead class="bg-zinc-900/50">
+          <tr class="border-b border-zinc-800">
+            <th class="px-4 py-3 text-left text-xs font-medium text-zinc-400">Task</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-zinc-400">Tokens</th>
+            <th class="hidden px-4 py-3 text-left text-xs font-medium text-zinc-400 sm:table-cell">When</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-zinc-800/50">
+          <tr class="transition hover:bg-zinc-900/30">
+            <td class="px-4 py-3 text-zinc-300">1 Lite fix (<code class="text-xs text-amber-400">fix.md</code>)</td>
+            <td class="px-4 py-3 font-mono text-emerald-400">~5-8K</td>
+            <td class="hidden px-4 py-3 text-zinc-500 sm:table-cell">Bug fix, small change</td>
+          </tr>
+          <tr class="transition hover:bg-zinc-900/30">
+            <td class="px-4 py-3 text-zinc-300">1 Full blueprint (what + how + now)</td>
+            <td class="px-4 py-3 font-mono text-emerald-400">~20-30K</td>
+            <td class="hidden px-4 py-3 text-zinc-500 sm:table-cell">New feature</td>
+          </tr>
+          <tr class="transition hover:bg-zinc-900/30">
+            <td class="px-4 py-3 text-zinc-300">2 Full blueprints (same session)</td>
+            <td class="px-4 py-3 font-mono text-emerald-400">~40K</td>
+            <td class="hidden px-4 py-3 text-zinc-500 sm:table-cell">Batched</td>
+          </tr>
+          <tr class="transition hover:bg-zinc-900/30">
+            <td class="px-4 py-3 text-zinc-300">Atlas regeneration</td>
+            <td class="px-4 py-3 font-mono text-emerald-400">~15K</td>
+            <td class="hidden px-4 py-3 text-zinc-500 sm:table-cell">First-time setup</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mx-auto mt-6 max-w-3xl rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-4">
+      <p class="flex items-start gap-2 text-sm text-zinc-300">
+        <svg class="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <span><strong class="text-emerald-400">Tip:</strong> Batch blueprints in one session to save ~5K tokens per additional blueprint. Atlas stays in context.</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUICK START CTA ============ -->
+<section id="quick-start" class="border-t border-zinc-900">
+  <div class="mx-auto max-w-6xl px-4 py-20 md:px-6">
+    <div class="mx-auto max-w-3xl rounded-lg border border-zinc-800 bg-zinc-900/50 p-8 md:p-12 card-glow">
+      <div class="text-center">
+        <h2 class="text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl">
+          Start in 30 seconds.
+        </h2>
+        <p class="mt-4 text-zinc-400">
+          Three commands to your first implementation-ready spec.
+        </p>
+      </div>
+
+      <div class="mt-8 space-y-3">
+        <div class="code-block group rounded-md border border-zinc-800 bg-zinc-950 p-4">
+          <div class="flex items-center justify-between">
+            <code class="text-sm"><span class="text-zinc-500">$</span> <span class="text-emerald-400">npx</span> amanah-blueprint</code>
+            <button onclick="copyCode(this, 'npx amanah-blueprint')" class="copy-hint text-xs text-zinc-500 transition hover:text-zinc-300">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+          </div>
+          <p class="mt-1 text-xs text-zinc-500">Install the framework in your project directory.</p>
+        </div>
+
+        <div class="code-block group rounded-md border border-zinc-800 bg-zinc-950 p-4">
+          <div class="flex items-center justify-between">
+            <code class="text-sm"><span class="text-zinc-500">claude&gt;</span> <span class="text-emerald-400">/setup</span></code>
+            <button onclick="copyCode(this, '/setup')" class="copy-hint text-xs text-zinc-500 transition hover:text-zinc-300">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+          </div>
+          <p class="mt-1 text-xs text-zinc-500">In Claude Code &mdash; generates atlas, installs skills, updates CLAUDE.md.</p>
+        </div>
+
+        <div class="code-block group rounded-md border border-zinc-800 bg-zinc-950 p-4">
+          <div class="flex items-center justify-between">
+            <code class="text-sm"><span class="text-zinc-500">claude&gt;</span> <span class="text-emerald-400">/blueprint</span> my-first-feature</code>
+            <button onclick="copyCode(this, '/blueprint my-first-feature')" class="copy-hint text-xs text-zinc-500 transition hover:text-zinc-300">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+          </div>
+          <p class="mt-1 text-xs text-zinc-500">Generates what.md, pauses for review, then how.md, then now.md.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section id="faq" class="border-t border-zinc-900">
+  <div class="mx-auto max-w-3xl px-4 py-20 md:px-6">
+    <div class="text-center reveal">
+      <p class="text-sm font-medium text-emerald-400">FAQ</p>
+      <h2 class="mt-2 text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl">
+        Common questions.
+      </h2>
+    </div>
+
+    <div class="mt-12 space-y-3">
+      <details class="reveal group rounded-lg border border-zinc-800 bg-zinc-900/50 transition hover:border-zinc-700">
+        <summary class="flex cursor-pointer items-center justify-between px-6 py-4 text-zinc-100">
+          <span class="font-medium">Does this work with any tech stack?</span>
+          <svg class="chevron h-4 w-4 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+        <div class="px-6 pb-4 text-sm text-zinc-400">
+          Yes. The generator detects your stack from <code class="rounded bg-zinc-800 px-1.5 py-0.5 text-xs text-emerald-400">CLAUDE.md</code>, <code class="rounded bg-zinc-800 px-1.5 py-0.5 text-xs text-emerald-400">package.json</code>, <code class="rounded bg-zinc-800 px-1.5 py-0.5 text-xs text-emerald-400">requirements.txt</code>, or similar files. Code examples and conventions are adapted to the detected stack.
+        </div>
+      </details>
+
+      <details class="reveal group rounded-lg border border-zinc-800 bg-zinc-900/50 transition hover:border-zinc-700">
+        <summary class="flex cursor-pointer items-center justify-between px-6 py-4 text-zinc-100">
+          <span class="font-medium">Can I use this without Claude Code?</span>
+          <svg class="chevron h-4 w-4 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+        <div class="px-6 pb-4 text-sm text-zinc-400">
+          Slash commands are Claude Code-specific, but the blueprint structure (what/how/now and fix.md) works with any AI assistant or as a team convention for human developers. The file format is plain Markdown.
+        </div>
+      </details>
+
+      <details class="reveal group rounded-lg border border-zinc-800 bg-zinc-900/50 transition hover:border-zinc-700">
+        <summary class="flex cursor-pointer items-center justify-between px-6 py-4 text-zinc-100">
+          <span class="font-medium">Does it modify my source code?</span>
+          <svg class="chevron h-4 w-4 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+        <div class="px-6 pb-4 text-sm text-zinc-400">
+          No. The framework only writes files to <code class="rounded bg-zinc-800 px-1.5 py-0.5 text-xs text-emerald-400">.amanah/</code>, <code class="rounded bg-zinc-800 px-1.5 py-0.5 text-xs text-emerald-400">.claude/commands/</code>, <code class="rounded bg-zinc-800 px-1.5 py-0.5 text-xs text-emerald-400">.claude/skills/</code>, and <code class="rounded bg-zinc-800 px-1.5 py-0.5 text-xs text-emerald-400">.claude/agents/</code>. Your source code is never touched.
+        </div>
+      </details>
+
+      <details class="reveal group rounded-lg border border-zinc-800 bg-zinc-900/50 transition hover:border-zinc-700">
+        <summary class="flex cursor-pointer items-center justify-between px-6 py-4 text-zinc-100">
+          <span class="font-medium">How is this different from GitHub Issues or Jira?</span>
+          <svg class="chevron h-4 w-4 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+        <div class="px-6 pb-4 text-sm text-zinc-400">
+          Issue trackers <strong>track</strong> work. Blueprints <strong>define</strong> how to do the work. A blueprint is what you hand to a developer (or AI agent) so they can implement without guessing. Blueprints can be linked from issues &mdash; the issue tracks state, the blueprint specifies execution.
+        </div>
+      </details>
+
+      <details class="reveal group rounded-lg border border-zinc-800 bg-zinc-900/50 transition hover:border-zinc-700">
+        <summary class="flex cursor-pointer items-center justify-between px-6 py-4 text-zinc-100">
+          <span class="font-medium">When should I use Full vs Lite Mode?</span>
+          <svg class="chevron h-4 w-4 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+        <div class="px-6 pb-4 text-sm text-zinc-400">
+          Use Full Mode for new features, multi-component work, or when architecture decisions are needed. Use Lite Mode for bug fixes, hotfixes, and small changes affecting &le;5 files. Lite Mode auto-escalates to Full Mode if the bug turns out to be systemic.
+        </div>
+      </details>
+
+      <details class="reveal group rounded-lg border border-zinc-800 bg-zinc-900/50 transition hover:border-zinc-700">
+        <summary class="flex cursor-pointer items-center justify-between px-6 py-4 text-zinc-100">
+          <span class="font-medium">Can I customize the templates?</span>
+          <svg class="chevron h-4 w-4 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+        <div class="px-6 pb-4 text-sm text-zinc-400">
+          Yes. Edit <code class="rounded bg-zinc-800 px-1.5 py-0.5 text-xs text-emerald-400">SKILL.md</code> and <code class="rounded bg-zinc-800 px-1.5 py-0.5 text-xs text-emerald-400">AGENT.md</code> in your project's <code class="rounded bg-zinc-800 px-1.5 py-0.5 text-xs text-emerald-400">.amanah/</code> directory to add project-specific rules or modify generation behavior.
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="border-t border-zinc-900">
+  <div class="mx-auto max-w-6xl px-4 py-12 md:px-6">
+    <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
+      <div class="flex items-center gap-2">
+        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 ring-1 ring-emerald-500/30">
+          <span class="font-mono text-sm font-bold text-emerald-400">A</span>
+        </div>
+        <div>
+          <p class="font-mono text-sm font-semibold text-zinc-100">amanah-blueprint</p>
+          <p class="text-xs text-zinc-500">Specs that ship without revisions.</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4 text-sm">
+        <a href="https://github.com/NHadi/AmanahAgent.Blueprint.Skills" target="_blank" rel="noopener" class="text-zinc-400 transition hover:text-zinc-100">GitHub</a>
+        <a href="https://www.npmjs.com/package/amanah-blueprint" target="_blank" rel="noopener" class="text-zinc-400 transition hover:text-zinc-100">npm</a>
+        <a href="https://github.com/NHadi/AmanahAgent.Blueprint.Skills/blob/main/README.md" target="_blank" rel="noopener" class="text-zinc-400 transition hover:text-zinc-100">Docs</a>
+        <a href="https://github.com/NHadi/AmanahAgent.Blueprint.Skills/issues" target="_blank" rel="noopener" class="text-zinc-400 transition hover:text-zinc-100">Issues</a>
+      </div>
+    </div>
+
+    <div class="mt-8 border-t border-zinc-900 pt-6 text-center">
+      <p class="text-xs text-zinc-500">MIT License &mdash; No attribution required. Built by <a href="https://github.com/NHadi" target="_blank" rel="noopener" class="text-zinc-400 transition hover:text-zinc-200">Nurul Hadi</a>.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ PRISM.JS (load after content) ============ -->
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-markup.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-markdown.min.js" defer></script>
+<script>
+  window.addEventListener('load', () => {
+    if (window.Prism) Prism.highlightAll();
+  });
+</script>
+
+<!-- ============ INTERACTIVE JS ============ -->
+<script>
+  // ===== Copy to Clipboard =====
+  function copyCode(button, text) {
+    navigator.clipboard.writeText(text).then(() => {
+      const originalHTML = button.innerHTML;
+      button.innerHTML = `
+        <svg class="h-3.5 w-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span class="text-emerald-400">Copied</span>
+      `;
+      setTimeout(() => { button.innerHTML = originalHTML; }, 2000);
+    });
+  }
+
+  // ===== Tab Switching =====
+  function switchTab(tab) {
+    // Update buttons
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+
+    // Update content
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById('content-' + tab).classList.add('active');
+
+    // Re-highlight Prism
+    if (window.Prism) Prism.highlightAll();
+  }
+
+  // ===== Scroll Reveal =====
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ===== Animated Terminal =====
+  const terminalLines = [
+    { text: '$ npx amanah-blueprint', color: 'zinc' },
+    { text: '  ✓ Framework installed to .amanah/', color: 'emerald', delay: 400 },
+    { text: '  ✓ Slash commands bootstrapped to .claude/commands/', color: 'emerald', delay: 300 },
+    { text: '', delay: 400 },
+    { text: 'claude> /setup', color: 'zinc', delay: 300 },
+    { text: '  → Scanning codebase (imports, patterns, structure)...', color: 'zinc', delay: 500 },
+    { text: '  ✓ atlas/product.md generated', color: 'emerald', delay: 200 },
+    { text: '  ✓ atlas/tech.md generated', color: 'emerald', delay: 150 },
+    { text: '  ✓ atlas/structure.md generated', color: 'emerald', delay: 150 },
+    { text: '  ✓ atlas/conventions.md generated', color: 'emerald', delay: 150 },
+    { text: '  ✓ atlas/quickstart.md generated', color: 'emerald', delay: 150 },
+    { text: '', delay: 400 },
+    { text: 'claude> /blueprint payment-integration', color: 'zinc', delay: 500 },
+    { text: '  → Researching codebase (atlas + grep + glob)...', color: 'zinc', delay: 500 },
+    { text: '  ✓ what.md generated (12 must-haves, 8 edge cases)', color: 'emerald', delay: 400 },
+    { text: '  → Paused for review...', color: 'amber', delay: 300 },
+    { text: '  ✓ how.md generated (5 components, 6 properties)', color: 'emerald', delay: 400 },
+    { text: '  ✓ now.md generated (18 action items, 4 checkpoints)', color: 'emerald', delay: 400 },
+    { text: '', delay: 300 },
+    { text: '  ═══════════════════════════════════════════', color: 'emerald', delay: 200 },
+    { text: '  ✓ Blueprint ready. 29/29 quality gates passed.', color: 'emerald', delay: 200, bold: true },
+  ];
+
+  let terminalTimeouts = [];
+
+  function startTerminal() {
+    // Clear existing
+    const term = document.getElementById('terminal');
+    term.innerHTML = '';
+    terminalTimeouts.forEach(t => clearTimeout(t));
+    terminalTimeouts = [];
+
+    let cumulativeDelay = 0;
+
+    terminalLines.forEach((line, i) => {
+      cumulativeDelay += line.delay || 100;
+
+      const timeout = setTimeout(() => {
+        const div = document.createElement('div');
+        div.className = 'terminal-line';
+        div.style.animationDelay = '0s';
+
+        const colorClass = line.color === 'emerald' ? 'text-emerald-400'
+          : line.color === 'amber' ? 'text-amber-400'
+          : 'text-zinc-400';
+
+        const boldClass = line.bold ? ' font-semibold' : '';
+
+        if (line.text === '') {
+          div.innerHTML = '&nbsp;';
+        } else {
+          div.innerHTML = `<span class="${colorClass}${boldClass}">${line.text}</span>`;
+        }
+
+        term.appendChild(div);
+
+        // Add cursor on last line
+        if (i === terminalLines.length - 1) {
+          const cursor = document.createElement('span');
+          cursor.className = 'cursor-blink text-emerald-400 ml-1';
+          cursor.innerHTML = '_';
+          div.appendChild(cursor);
+        }
+      }, cumulativeDelay);
+
+      terminalTimeouts.push(timeout);
+    });
+
+    // Auto-replay after 5 seconds
+    const replayTimeout = setTimeout(() => startTerminal(), cumulativeDelay + 5000);
+    terminalTimeouts.push(replayTimeout);
+  }
+
+  // Start terminal when it scrolls into view
+  let terminalStarted = false;
+  const termObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !terminalStarted) {
+        terminalStarted = true;
+        startTerminal();
+      }
+    });
+  }, { threshold: 0.3 });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const termEl = document.getElementById('terminal');
+    if (termEl) termObserver.observe(termEl);
+  });
+</script>
+
+</body>
+</html>
