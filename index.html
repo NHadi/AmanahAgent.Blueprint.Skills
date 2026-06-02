@@ -89,7 +89,7 @@
   <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
 
   <!-- Favicon -->
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2309090b'/%3E%3Cpath d='M30 70V30h40v8H38v10h28v8H38v14z' fill='%2334d399'/%3E%3C/svg%3E" type="image/svg+xml" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2309090b'/%3E%3Cpath d='M16 3L3 29h9l2-8h4l2 8h9z' fill='%2334d399'/%3E%3Cpath d='M16 11l-2 7h4z' fill='%2309090b'/%3E%3Crect x='10' y='18' width='12' height='3' rx='1' fill='%2334d399'/%3E%3C/svg%3E" type="image/svg+xml" />
 
   <style>
     body { font-family: 'Inter', system-ui, sans-serif; background: #09090b; color: #f4f4f5; }
@@ -218,17 +218,132 @@
     details summary { list-style: none; }
     details[open] .chevron { transform: rotate(180deg); }
     .chevron { transition: transform 0.2s; }
+
+    /* ===== EFFECT 1: Blueprint Grid Background ===== */
+    body {
+      background-image:
+        linear-gradient(rgba(52, 211, 153, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(52, 211, 153, 0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    /* ===== EFFECT 2: Scanline ===== */
+    .scanline {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent 0%, #34d399 30%, #34d399 70%, transparent 100%);
+      box-shadow: 0 0 15px rgba(52, 211, 153, 0.4), 0 0 60px rgba(52, 211, 153, 0.15);
+      z-index: 999;
+      pointer-events: none;
+      animation: scanMove 6s linear infinite;
+      opacity: 0.7;
+    }
+    @keyframes scanMove {
+      0% { transform: translateY(-2px); }
+      100% { transform: translateY(100vh); }
+    }
+
+    /* ===== EFFECT 3: Typing Cursor ===== */
+    .typing-cursor::after {
+      content: '▊';
+      color: #34d399;
+      animation: blink 0.8s step-end infinite;
+      margin-left: 1px;
+    }
+
+    /* ===== EFFECT 5: Draw Border on Reveal ===== */
+    .reveal.visible {
+      animation: drawIn 0.5s ease-out forwards, fadeIn 0.5s ease-out forwards;
+    }
+    @keyframes drawIn {
+      0% { clip-path: inset(0 100% 0 0); }
+      25% { clip-path: inset(0 0 100% 0); }
+      50% { clip-path: inset(0 0 0 100%); }
+      75% { clip-path: inset(100% 0 0 0); }
+      100% { clip-path: inset(0 0 0 0); }
+    }
+
+    /* ===== EFFECT 6: Floating Dots ===== */
+    .floating-dot {
+      position: absolute;
+      width: 3px; height: 3px;
+      border-radius: 50%;
+      background: #34d399;
+      opacity: 0;
+      pointer-events: none;
+      animation: floatUp linear infinite;
+    }
+    @keyframes floatUp {
+      0% { opacity: 0; transform: translateY(0) scale(0.5); }
+      15% { opacity: 0.6; }
+      85% { opacity: 0.2; }
+      100% { opacity: 0; transform: translateY(-200px) scale(0); }
+    }
+
+    /* Generating status for typing effect */
+    .generating-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 6px;
+      background: rgba(52, 211, 153, 0.08);
+      border: 1px solid rgba(52, 211, 153, 0.15);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #34d399;
+      margin-bottom: 12px;
+    }
+    .generating-dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #34d399;
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    /* ===== EFFECT 7: Particle Network Canvas ===== */
+    #particle-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -1;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body class="antialiased">
+  <!-- Effect 7: Particle Network Background -->
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- Effect 2: Scanline -->
+  <div class="scanline"></div>
+
+  <!-- Shared SVG definitions for logo gradient -->
+  <svg width="0" height="0" style="position:absolute" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="crystal-a" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#059669"/>
+        <stop offset="42%" stop-color="#10b981"/>
+        <stop offset="43%" stop-color="#34d399"/>
+        <stop offset="100%" stop-color="#6ee7b7"/>
+      </linearGradient>
+    </defs>
+  </svg>
 
 <!-- ============ NAV BAR ============ -->
 <nav class="sticky top-0 z-50 border-b border-zinc-900 bg-zinc-950/80 backdrop-blur-xl">
   <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-6">
     <a href="#" class="flex items-center gap-2">
       <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 ring-1 ring-emerald-500/30">
-        <span class="font-mono text-sm font-bold text-emerald-400">A</span>
-      </div>
+          <svg class="h-5 w-5" viewBox="0 0 40 40" fill="none">
+            <rect width="40" height="40" rx="10" fill="#09090b"/>
+            <path d="M20 6L8 34h24z" fill="#34d399"/>
+            <path d="M20 14l-4.5 14h9z" fill="#09090b"/>
+            <rect x="14" y="22" width="12" height="2.5" rx="1" fill="#34d399"/>
+          </svg>
+        </div>
       <span class="font-mono text-sm font-semibold tracking-tight text-zinc-100">amanah-blueprint</span>
     </a>
     <div class="flex items-center gap-3 md:gap-6">
@@ -249,8 +364,19 @@
 
 <!-- ============ HERO ============ -->
 <section class="hero-glow relative overflow-hidden">
+  <!-- Effect 6: Floating dots container -->
+  <div id="floating-dots" class="absolute inset-0 overflow-hidden pointer-events-none z-0"></div>
   <div class="relative z-10 mx-auto max-w-6xl px-4 py-20 md:px-6 md:py-28">
     <div class="mx-auto max-w-3xl text-center">
+      <!-- Logo mark -->
+      <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/10 ring-1 ring-emerald-500/30 shadow-lg shadow-emerald-500/10">
+        <svg class="h-10 w-10" viewBox="0 0 40 40" fill="none">
+          <rect width="40" height="40" rx="10" fill="#09090b"/>
+          <path d="M20 6L8 34h24z" fill="#34d399"/>
+          <path d="M20 14l-4.5 14h9z" fill="#09090b"/>
+          <rect x="14" y="22" width="12" height="2.5" rx="1" fill="#34d399"/>
+        </svg>
+      </div>
       <!-- Eyebrow badge -->
       <a href="https://www.npmjs.com/package/amanah-blueprint" target="_blank" rel="noopener" class="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/50 px-3 py-1 text-xs font-medium text-zinc-400 transition hover:border-zinc-700 hover:text-zinc-200">
         <span class="relative flex h-1.5 w-1.5">
@@ -822,14 +948,126 @@ flowchart TD
     <div class="mx-auto max-w-2xl text-center reveal">
       <p class="text-sm font-medium text-emerald-400">Quality Gates</p>
       <h2 class="mt-2 text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl">
-        29 checks enforced on every blueprint.
+        <span data-count="29" class="font-mono text-emerald-400">0</span> quality gates enforced on every blueprint.
       </h2>
       <p class="mt-4 text-zinc-400">
-        Click a category to see the individual checks. These run before a blueprint is finalized.
+        Every blueprint enforces a set of quality gates before it is considered complete.
+        These are what eliminate the revision cycle typical of AI-generated specs.
       </p>
     </div>
 
-    <div class="mx-auto mt-10 max-w-3xl space-y-3">
+    <!-- Quality Gates Visual Map -->
+    <div class="mx-auto mt-12 max-w-4xl reveal">
+      <!-- Root node -->
+      <div class="flex justify-center mb-6">
+        <div class="flex items-center gap-3 px-6 py-3 rounded-full bg-emerald-500/10 border border-emerald-500/30">
+          <svg class="h-5 w-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span class="font-semibold text-emerald-300 font-mono">29 Quality Gates</span>
+        </div>
+      </div>
+
+      <!-- Category cards in 2-col grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <!-- Edge Cases -->
+        <div class="rounded-lg border border-zinc-800 bg-zinc-900/60 p-4">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="flex h-6 w-6 items-center justify-center rounded bg-orange-500/15 text-orange-400 text-xs font-bold">E</span>
+            <span class="text-sm font-semibold text-zinc-100">Edge Cases</span>
+          </div>
+          <ul class="text-xs text-zinc-500 space-y-1">
+            <li>Minimum 5 per feature</li>
+            <li>Exact expected behavior</li>
+            <li>Trace to Properties &amp; Tests</li>
+          </ul>
+        </div>
+        <!-- Code Quality -->
+        <div class="rounded-lg border border-zinc-800 bg-zinc-900/60 p-4">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="flex h-6 w-6 items-center justify-center rounded bg-violet-500/15 text-violet-400 text-xs font-bold">C</span>
+            <span class="text-sm font-semibold text-zinc-100">Code Quality</span>
+          </div>
+          <ul class="text-xs text-zinc-500 space-y-1">
+            <li>No stubbed code anywhere</li>
+            <li>No deprecated APIs</li>
+            <li>Circular import detection</li>
+          </ul>
+        </div>
+        <!-- Correctness -->
+        <div class="rounded-lg border border-zinc-800 bg-zinc-900/60 p-4">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="flex h-6 w-6 items-center justify-center rounded bg-blue-500/15 text-blue-400 text-xs font-bold">P</span>
+            <span class="text-sm font-semibold text-zinc-100">Correctness</span>
+          </div>
+          <ul class="text-xs text-zinc-500 space-y-1">
+            <li>Formal Properties</li>
+            <li>Property-to-code consistency</li>
+            <li>Property-to-test coverage</li>
+          </ul>
+        </div>
+        <!-- Reuse First -->
+        <div class="rounded-lg border border-zinc-800 bg-zinc-900/60 p-4">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="flex h-6 w-6 items-center justify-center rounded bg-cyan-500/15 text-cyan-400 text-xs font-bold">R</span>
+            <span class="text-sm font-semibold text-zinc-100">Reuse First</span>
+          </div>
+          <ul class="text-xs text-zinc-500 space-y-1">
+            <li>Existing code inventory</li>
+            <li>File path validation</li>
+            <li>Cross-blueprint conflict detection</li>
+          </ul>
+        </div>
+        <!-- Traceability -->
+        <div class="rounded-lg border border-zinc-800 bg-zinc-900/60 p-4">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="flex h-6 w-6 items-center justify-center rounded bg-emerald-500/15 text-emerald-400 text-xs font-bold">T</span>
+            <span class="text-sm font-semibold text-zinc-100">Traceability</span>
+          </div>
+          <ul class="text-xs text-zinc-500 space-y-1">
+            <li>M-N to action items</li>
+            <li>Action items to tests</li>
+            <li>Edge cases to Properties</li>
+          </ul>
+        </div>
+        <!-- Security -->
+        <div class="rounded-lg border border-zinc-800 bg-zinc-900/60 p-4">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="flex h-6 w-6 items-center justify-center rounded bg-red-500/15 text-red-400 text-xs font-bold">S</span>
+            <span class="text-sm font-semibold text-zinc-100">Security</span>
+          </div>
+          <ul class="text-xs text-zinc-500 space-y-1">
+            <li>SQL injection check</li>
+            <li>Auth on all endpoints</li>
+            <li>No hardcoded secrets</li>
+          </ul>
+        </div>
+        <!-- Performance — full width -->
+        <div class="rounded-lg border border-zinc-800 bg-zinc-900/60 p-4 sm:col-span-2 lg:col-span-3">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="flex h-6 w-6 items-center justify-center rounded bg-amber-500/15 text-amber-400 text-xs font-bold">⚡</span>
+            <span class="text-sm font-semibold text-zinc-100">Performance</span>
+            <span class="text-xs text-zinc-600">— 6 checks</span>
+          </div>
+          <div class="flex flex-wrap gap-x-6 gap-y-1 text-xs text-zinc-500">
+            <span>DB indexes on non-PK columns</span>
+            <span>No N+1 queries</span>
+            <span>Long tasks backgrounded</span>
+            <span>External call timeouts</span>
+            <span>Concurrency protection</span>
+            <span>Pagination on all list endpoints</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Validation Checklist (Excerpt) -->
+    <div class="mx-auto mt-16 max-w-3xl reveal">
+      <h3 class="text-lg font-semibold text-zinc-100 mb-2">Validation Checklist (Excerpt)</h3>
+      <p class="text-sm text-zinc-400 mb-6">
+        The generator validates every blueprint against 29 checks before finalizing. Key categories:
+      </p>
+    </div>
+
+    <div class="mx-auto max-w-3xl space-y-3">
       <!-- Traceability -->
       <details class="reveal rounded-lg border border-zinc-800 bg-zinc-900/50 card-glow" open>
         <summary class="flex cursor-pointer items-center justify-between px-6 py-4">
@@ -838,13 +1076,12 @@ flowchart TD
               <svg class="h-4 w-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/></svg>
             </div>
             <span class="font-medium text-zinc-100">Traceability</span>
-            <span class="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400">8 checks</span>
+            <span class="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400"><span data-count="8" class="counter-el">0</span> checks</span>
           </div>
           <svg class="chevron h-4 w-4 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </summary>
         <div class="border-t border-zinc-800 px-6 py-4 text-sm text-zinc-400">
           <ul class="space-y-2">
-            <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> Every action item references at least one must-have (M-N)</li>
             <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> Every must-have has at least one action item</li>
             <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> Every Property links to at least one must-have</li>
             <li class="flex gap-2"><span class="text-emerald-400">&#x2713;</span> Every Property has a corresponding test in now.md</li>
@@ -864,7 +1101,7 @@ flowchart TD
               <svg class="h-4 w-4 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </div>
             <span class="font-medium text-zinc-100">Security</span>
-            <span class="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400">7 checks</span>
+            <span class="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400"><span data-count="7" class="counter-el">0</span> checks</span>
           </div>
           <svg class="chevron h-4 w-4 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </summary>
@@ -889,7 +1126,7 @@ flowchart TD
               <svg class="h-4 w-4 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
             </div>
             <span class="font-medium text-zinc-100">Performance</span>
-            <span class="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400">6 checks</span>
+            <span class="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400"><span data-count="6" class="counter-el">0</span> checks</span>
           </div>
           <svg class="chevron h-4 w-4 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </summary>
@@ -913,7 +1150,7 @@ flowchart TD
               <svg class="h-4 w-4 text-violet-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
             </div>
             <span class="font-medium text-zinc-100">Code Quality</span>
-            <span class="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400">5 checks</span>
+            <span class="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400"><span data-count="5" class="counter-el">0</span> checks</span>
           </div>
           <svg class="chevron h-4 w-4 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </summary>
@@ -936,7 +1173,7 @@ flowchart TD
               <svg class="h-4 w-4 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
             </div>
             <span class="font-medium text-zinc-100">File Integrity</span>
-            <span class="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400">3 checks</span>
+            <span class="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400"><span data-count="3" class="counter-el">0</span> checks</span>
           </div>
           <svg class="chevron h-4 w-4 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </summary>
@@ -1244,7 +1481,12 @@ flowchart TD
     <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
       <div class="flex items-center gap-2">
         <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 ring-1 ring-emerald-500/30">
-          <span class="font-mono text-sm font-bold text-emerald-400">A</span>
+          <svg class="h-5 w-5" viewBox="0 0 40 40" fill="none">
+            <rect width="40" height="40" rx="10" fill="#09090b"/>
+            <path d="M20 6L8 34h24z" fill="#34d399"/>
+            <path d="M20 14l-4.5 14h9z" fill="#09090b"/>
+            <rect x="14" y="22" width="12" height="2.5" rx="1" fill="#34d399"/>
+          </svg>
         </div>
         <div>
           <p class="font-mono text-sm font-semibold text-zinc-100">amanah-blueprint</p>
@@ -1292,18 +1534,75 @@ flowchart TD
     });
   }
 
-  // ===== Tab Switching =====
+  // ===== Tab Switching with Typing Effect =====
+  const tabContents = {};
+  let typingActive = false;
+
   function switchTab(tab) {
+    if (typingActive) return;
+
     // Update buttons
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('tab-' + tab).classList.add('active');
 
-    // Update content
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    document.getElementById('content-' + tab).classList.add('active');
+    // Hide all content
+    document.querySelectorAll('.tab-content').forEach(c => {
+      c.classList.remove('active');
+    });
 
-    // Re-highlight Prism
-    if (window.Prism) Prism.highlightAll();
+    const contentEl = document.getElementById('content-' + tab);
+
+    // Cache original HTML on first load
+    if (!tabContents[tab]) {
+      tabContents[tab] = contentEl.querySelector('pre').innerHTML;
+    }
+
+    const originalHTML = tabContents[tab];
+    const preEl = contentEl.querySelector('pre');
+    const codeEl = preEl.querySelector('code');
+
+    // Show container with generating status
+    contentEl.classList.add('active');
+
+    // Add generating status
+    const statusHTML = `<div class="generating-status" id="gen-status"><span class="generating-dot"></span> Generating ${tab}.md...</div>`;
+    preEl.insertAdjacentHTML('beforebegin', statusHTML);
+
+    // Start typing
+    typingActive = true;
+    const plainText = codeEl.textContent;
+    codeEl.textContent = '';
+    codeEl.className = 'language-markdown'; // reset Prism
+
+    let charIndex = 0;
+    const speed = Math.max(2, Math.min(8, 3000 / plainText.length)); // adaptive speed
+
+    function typeChar() {
+      if (charIndex < plainText.length) {
+        // Add characters in chunks for performance
+        const chunk = Math.min(3, plainText.length - charIndex);
+        codeEl.textContent += plainText.substring(charIndex, charIndex + chunk);
+        charIndex += chunk;
+
+        // Add cursor on last visible character
+        codeEl.classList.add('typing-cursor');
+        setTimeout(typeChar, speed);
+      } else {
+        // Done typing — show full highlighted version
+        codeEl.classList.remove('typing-cursor');
+        codeEl.innerHTML = originalHTML;
+        typingActive = false;
+
+        // Remove generating status
+        const status = document.getElementById('gen-status');
+        if (status) status.remove();
+
+        // Re-highlight with Prism
+        if (window.Prism) Prism.highlightAll();
+      }
+    }
+
+    setTimeout(typeChar, 300);
   }
 
   // ===== Scroll Reveal =====
@@ -1406,6 +1705,125 @@ flowchart TD
   document.addEventListener('DOMContentLoaded', () => {
     const termEl = document.getElementById('terminal');
     if (termEl) termObserver.observe(termEl);
+
+    // ===== EFFECT 4: Animated Counters =====
+    function animateCounter(el, target, duration = 1500) {
+      const start = performance.now();
+      function update(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+        el.textContent = Math.round(target * eased);
+        if (progress < 1) requestAnimationFrame(update);
+      }
+      requestAnimationFrame(update);
+    }
+
+    // Observe counter elements
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !entry.target.dataset.counted) {
+          entry.target.dataset.counted = 'true';
+          const target = parseInt(entry.target.dataset.count, 10);
+          animateCounter(entry.target, target);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('[data-count]').forEach(el => counterObserver.observe(el));
+
+    // ===== EFFECT 6: Floating Dots in Hero =====
+    const dotsContainer = document.getElementById('floating-dots');
+    if (dotsContainer) {
+      for (let i = 0; i < 12; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'floating-dot';
+        dot.style.left = Math.random() * 100 + '%';
+        dot.style.bottom = '-10px';
+        dot.style.animationDuration = (6 + Math.random() * 8) + 's';
+        dot.style.animationDelay = (Math.random() * 10) + 's';
+        dot.style.width = (2 + Math.random() * 3) + 'px';
+        dot.style.height = dot.style.width;
+        dotsContainer.appendChild(dot);
+      }
+    }
+
+    // ===== EFFECT 7: Particle Network Background =====
+    (function() {
+      const canvas = document.getElementById('particle-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let w, h, particles = [];
+      const PARTICLE_COUNT = 60;
+      const MAX_DIST = 140;
+      const SPEED = 0.3;
+
+      function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      // Create particles
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        particles.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          vx: (Math.random() - 0.5) * SPEED,
+          vy: (Math.random() - 0.5) * SPEED,
+          r: 1.2 + Math.random() * 1.3,
+        });
+      }
+
+      // Check prefers-reduced-motion
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function draw() {
+        ctx.clearRect(0, 0, w, h);
+
+        // Update positions
+        for (const p of particles) {
+          if (!prefersReduced) {
+            p.x += p.vx;
+            p.y += p.vy;
+          }
+          if (p.x < 0) p.x = w;
+          if (p.x > w) p.x = 0;
+          if (p.y < 0) p.y = h;
+          if (p.y > h) p.y = 0;
+        }
+
+        // Draw connections
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < MAX_DIST) {
+              const alpha = (1 - dist / MAX_DIST) * 0.15;
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = `rgba(52, 211, 153, ${alpha})`;
+              ctx.lineWidth = 0.6;
+              ctx.stroke();
+            }
+          }
+        }
+
+        // Draw dots
+        for (const p of particles) {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(52, 211, 153, 0.35)';
+          ctx.fill();
+        }
+
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
   });
 </script>
 
