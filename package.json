@@ -29,8 +29,12 @@
   },
   "homepage": "https://github.com/NHadi/AmanahAgent.Blueprint.Skills#readme",
   "files": [
-    ".amanah/",
     "bin/",
+    "commands/",
+    "atlas-generator/",
+    "SKILL.md",
+    "AGENT.md",
+    "install.sh",
     "README.md",
     "LICENSE"
   ],

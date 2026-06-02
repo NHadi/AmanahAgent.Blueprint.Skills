@@ -4,16 +4,14 @@
  * Amanah Blueprint CLI
  *
  * Usage:
- *   npx amanah-blueprint          Copy .amanah/ + bootstrap commands
+ *   npx amanah-blueprint          Install .amanah/ + bootstrap slash commands
  *   npx amanah-blueprint setup    Same as above (alias)
  *   npx amanah-blueprint help     Show help
  */
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
 
-const COMMANDS = ['setup', 'help', 'init'];
 const args = process.argv.slice(2);
 const command = args[0] || 'setup';
 
@@ -44,7 +42,7 @@ Slash Commands:
   /spec <name>                  Read existing blueprint
   /atlas                        Regenerate atlas from codebase
 
-Documentation: https://github.com/nurulhadi/amanah-blueprint
+Documentation: https://github.com/NHadi/AmanahAgent.Blueprint.Skills
 `);
 }
 
@@ -54,6 +52,8 @@ function copyDir(src, dest) {
   }
   const entries = fs.readdirSync(src, { withFileTypes: true });
   for (const entry of entries) {
+    // Skip .git, node_modules, .gitignore
+    if (entry.name.startsWith('.git') || entry.name === 'node_modules') continue;
     const srcPath = path.join(src, entry.name);
     const destPath = path.join(dest, entry.name);
     if (entry.isDirectory()) {
@@ -66,10 +66,11 @@ function copyDir(src, dest) {
 
 function install() {
   const cwd = process.cwd();
-  const sourceDir = path.join(__dirname, '..', '.amanah');
+  // Package root is one level up from bin/
+  const pkgRoot = path.join(__dirname, '..');
+  const targetDir = path.join(cwd, '.amanah');
 
   // Check if .amanah/ already exists
-  const targetDir = path.join(cwd, '.amanah');
   if (fs.existsSync(targetDir)) {
     warn('.amanah/ already exists in this directory.');
     const readline = require('readline').createInterface({
@@ -80,21 +81,44 @@ function install() {
       readline.close();
       if (answer.toLowerCase() === 'y') {
         fs.rmSync(targetDir, { recursive: true, force: true });
-        doInstall(sourceDir, cwd);
+        doInstall(pkgRoot, cwd, targetDir);
       } else {
         console.log('Cancelled.');
         process.exit(0);
       }
     });
   } else {
-    doInstall(sourceDir, cwd);
+    doInstall(pkgRoot, cwd, targetDir);
   }
 }
 
-function doInstall(sourceDir, cwd) {
-  // Copy .amanah/
-  log('Copying .amanah/ to project...');
-  copyDir(sourceDir, path.join(cwd, '.amanah'));
+function doInstall(pkgRoot, cwd, targetDir) {
+  // Files/dirs to copy into .amanah/
+  const toCopy = [
+    'SKILL.md',
+    'AGENT.md',
+    'LICENSE',
+    'README.md',
+    'commands',
+    'atlas-generator',
+  ];
+
+  log('Copying framework to .amanah/...');
+  fs.mkdirSync(targetDir, { recursive: true });
+
+  let copied = 0;
+  for (const item of toCopy) {
+    const src = path.join(pkgRoot, item);
+    const dest = path.join(targetDir, item);
+    if (!fs.existsSync(src)) continue;
+    if (fs.statSync(src).isDirectory()) {
+      copyDir(src, dest);
+    } else {
+      fs.copyFileSync(src, dest);
+    }
+    copied++;
+  }
+  log(`Copied ${copied} items to .amanah/`);
 
   // Bootstrap slash commands
   info('Bootstrapping slash commands...');
@@ -102,13 +126,11 @@ function doInstall(sourceDir, cwd) {
   if (!fs.existsSync(commandsDir)) {
     fs.mkdirSync(commandsDir, { recursive: true });
   }
-  const sourceCommands = path.join(cwd, '.amanah', 'commands');
+  const sourceCommands = path.join(targetDir, 'commands');
   if (fs.existsSync(sourceCommands)) {
-    const files = fs.readdirSync(sourceCommands);
+    const files = fs.readdirSync(sourceCommands).filter(f => f.endsWith('.md'));
     files.forEach(f => {
-      if (f.endsWith('.md')) {
-        fs.copyFileSync(path.join(sourceCommands, f), path.join(commandsDir, f));
-      }
+      fs.copyFileSync(path.join(sourceCommands, f), path.join(commandsDir, f));
     });
     log(`Installed ${files.length} slash commands to .claude/commands/`);
   }
