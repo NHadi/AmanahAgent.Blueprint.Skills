@@ -396,6 +396,8 @@ class MyComponent:
 
 ## Action Items
 
+> During implementation, mark each item as `- [x]` when complete. Checkpoints are marked last (when all tasks in that wave are done). This enables progress tracking and resume-after-interrupt.
+
 - [ ] 1. {Layer}: {Task title}
   - [ ] 1.1 Create `{exact/file/path}`
     - Define `{CLASS_OR_FUNCTION_NAME}` with {exact fields or parameters}
@@ -486,6 +488,62 @@ After generating all three files:
 15. **Test-Property coverage**: Count Correctness Properties in how.md. Count test items in now.md. Every Property must have at least one test. Flag orphans.
 16. **Edge case test coverage**: Count edge cases in what.md. Count edge case tests in now.md. Every edge case must have at least one test. Flag gaps.
 17. **Function name consistency**: Check that function/variable names in now.md match exactly with how.md code examples. Flag mismatches (e.g., `_truncate` vs `truncate`, private vs public).
+
+---
+
+## Implementation Tracking
+
+When implementing from `now.md` (or `fix.md`), the AI MUST track progress by marking items as done:
+
+### Rules
+
+1. **Mark `- [x]` when a task is complete** — after finishing each subtask, edit `now.md` and change `- [ ]` to `- [x]`
+2. **Mark checkpoints last** — only mark a checkpoint `- [x]` when ALL tasks in that wave are done
+3. **Mark in real-time** — don't wait until the end to mark everything. Mark each item as you complete it
+4. **If a task fails or is blocked** — leave it as `- [ ]` and add a comment: `- [ ] 1.1 ... <!-- BLOCKED: reason -->`
+5. **If a task is skipped** — mark as `~- [ ] 1.1 ...~` (strikethrough) with a comment explaining why
+
+### Example Flow
+
+```
+User: "implement the payment-integration blueprint"
+
+AI reads now.md → starts task 1.1
+  → creates the file
+  → edits now.md: - [x] 1.1 Create migration
+  → moves to task 1.2
+  → creates cost map table
+  → edits now.md: - [x] 1.2 Create cost map
+  → all wave 0 tasks done
+  → edits now.md: - [x] 2. Checkpoint — Database ready
+  → continues to wave 1...
+```
+
+### Progress Visibility
+
+After each task, the AI reports progress:
+
+```
+✅ 1.1 Create migration
+Progress: 1/9 tasks complete (11%)
+
+✅ 1.2 Create cost map table
+Progress: 2/9 tasks complete (22%)
+
+⏭️ Checkpoint — Database ready
+Progress: 2/9 tasks + 1/3 checkpoints
+```
+
+### Same for Lite Mode (fix.md)
+
+When implementing a bug fix from `fix.md`, mark each Fix Step as `- [x]` when done.
+
+### Why This Matters
+
+- **User can see progress at a glance** — open now.md, count `- [x]` vs `- [ ]`
+- **Resume interrupted work** — if session ends, next session reads now.md and continues from first `- [ ]`
+- **Audit trail** — the now.md file becomes a record of what was done and when
+- **Team visibility** — other devs can see implementation status without asking
 
 ---
 

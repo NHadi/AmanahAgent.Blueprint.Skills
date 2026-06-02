@@ -261,6 +261,18 @@ Insert between implementation phases:
 - **now.md edge case tests** — every edge case from what.md must have at least one test in now.md with `_Ref: Edge case "scenario name"_`
 - **Function name consistency** — names in now.md must match how.md code examples exactly (e.g., `process_payment` not `_process_payment`)
 
+## Implementation Tracking
+
+When implementing from a blueprint (now.md or fix.md), the agent MUST track progress:
+
+1. **Mark `- [x]` after completing each task** — edit the blueprint file in real-time
+2. **Mark checkpoints only when ALL tasks in that wave are done**
+3. **Report progress after each task**: `✅ 1.1 Task name — Progress: 2/9 (22%)`
+4. **If blocked**: leave `- [ ]` and add `<!-- BLOCKED: reason -->` comment
+5. **If skipped**: strikethrough `~- [ ]~` with comment explaining why
+
+This lets the user see progress by counting `- [x]` vs `- [ ]` in now.md, and enables resuming interrupted work.
+
 ---
 
 ## Lite Mode — Bug Fixes
