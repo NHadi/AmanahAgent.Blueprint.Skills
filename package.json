@@ -1,0 +1,38 @@
+{
+  "name": "amanah-blueprint",
+  "version": "5.1.0",
+  "description": "Implementation-ready feature blueprints and bug fix plans for Claude Code",
+  "main": "bin/amanah-blueprint.js",
+  "bin": {
+    "amanah-blueprint": "bin/amanah-blueprint.js"
+  },
+  "scripts": {
+    "postinstall": "node bin/postinstall.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NHadi/AmanahAgent.Blueprint.Skills.git"
+  },
+  "keywords": [
+    "claude-code",
+    "blueprint",
+    "spec",
+    "feature-planning",
+    "ai-coding",
+    "documentation",
+    "slash-commands"
+  ],
+  "author": "Nurul Hadi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/NHadi/AmanahAgent.Blueprint.Skills/issues"
+  },
+  "homepage": "https://github.com/NHadi/AmanahAgent.Blueprint.Skills#readme",
+  "files": [
+    ".amanah/",
+    "bin/",
+    "README.md",
+    "LICENSE"
+  ],
+  "preferGlobal": false
+}

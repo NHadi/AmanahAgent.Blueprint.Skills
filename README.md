@@ -10,11 +10,26 @@ Stop guessing what to build. Generate structured specs that any developer (or AI
 
 ## Quick Start
 
-### 60-Second Setup
+### Option A: One-Line Install (Recommended)
 
 ```bash
-# 1. Copy .amanah/ to your project
-cp -r .amanah /path/to/your-project/
+curl -sSL https://raw.githubusercontent.com/NHadi/AmanahAgent.Blueprint.Skills/main/install.sh | bash
+```
+
+This downloads `.amanah/` and bootstraps slash commands automatically.
+
+### Option B: npm / npx
+
+```bash
+npx amanah-blueprint
+```
+
+### Option C: Manual
+
+```bash
+# 1. Clone or download this repo
+git clone https://github.com/NHadi/AmanahAgent.Blueprint.Skills.git /tmp/abp
+cp -r /tmp/abp/.amanah /path/to/your-project/
 cd /path/to/your-project/
 
 # 2. Bootstrap slash commands (one-time, so /setup works)
