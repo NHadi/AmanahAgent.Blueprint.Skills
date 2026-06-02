@@ -22,7 +22,7 @@ Every team has the same problem: you describe a feature to an AI (or a junior de
 | AI writes plan from memory | AI reads YOUR code first, finds patterns |
 | "Handle errors gracefully" | Error table: exact scenario, HTTP code, response, recovery |
 | No edge cases | 5-10 edge cases with exact expected behavior |
-| Hope it works | 17 validation checks before coding starts |
+| Hope it works | 29 validation checks before coding starts |
 | "Write tests" | Property-based + unit + integration strategy |
 
 ---
@@ -38,7 +38,7 @@ flowchart LR
     A[Research<br/>Codebase] --> B[what.md<br/>Requirements]
     B --> C[how.md<br/>Design]
     C --> D[now.md<br/>Action Items]
-    D --> E[Validate<br/>17 checks]
+    D --> E[Validate<br/>29 checks]
     E --> F[Implement]
 
     style A fill:#4DA8DA,color:#fff
@@ -75,7 +75,7 @@ sequenceDiagram
     C->>FS: Generate now.md
     C-->>U: "Review now.md — any revisions?"
     U->>C: "Looks good"
-    C->>C: Validate (17 checks)
+    C->>C: Validate (29 checks)
     C-->>U: "Blueprint ready to implement"
 ```
 
@@ -933,12 +933,28 @@ mindmap
       M-X to action items
       Action items to tests
       Edge cases to Properties
+    Security
+      SQL injection check
+      Auth on all endpoints
+      Input validation
+      No hardcoded secrets
+      tenant_id isolation
+      No error info leak
+    Performance
+      DB indexes on non-PK
+      No N+1 queries
+      Long tasks backgrounded
+      External call timeouts
+      Concurrency protection
+      Pagination on lists
 ```
 
-17 validation checks run automatically after generation:
+29 validation checks run automatically after generation (17 quality + 6 security + 6 performance):
 
 <details>
-<summary><b>View all 17 validation checks</b></summary>
+<summary><b>View all 29 validation checks</b></summary>
+
+#### Quality Checks (1-17)
 
 | # | Check | What it catches |
 |---|-------|----------------|
@@ -960,7 +976,46 @@ mindmap
 | 16 | Edge case test coverage | Edge cases without tests |
 | 17 | Function name consistency | `_private` vs `public` mismatches |
 
+#### Security Checks (18-23)
+
+| # | Check | What it catches |
+|---|-------|----------------|
+| 18 | SQL injection | String concatenation in queries |
+| 19 | Auth on endpoints | Endpoints without auth dependency |
+| 20 | Input validation | Functions accepting untyped user input |
+| 21 | Secret exposure | Hardcoded API keys, passwords, tokens |
+| 22 | tenant_id isolation | Queries without tenant scoping |
+| 23 | Error info leak | Stack traces, SQL errors in responses |
+
+#### Performance Checks (24-29)
+
+| # | Check | What it catches |
+|---|-------|----------------|
+| 24 | DB indexes | WHERE/ORDER BY/JOIN columns without indexes |
+| 25 | N+1 queries | Loop-then-query patterns (use batch loading) |
+| 26 | Long tasks in HTTP handler | AI calls, file processing blocking request thread |
+| 27 | External call timeouts | API/LLM calls that can hang indefinitely |
+| 28 | Concurrency protection | Check-then-act without row lock / idempotency key |
+| 29 | Pagination on lists | Unbounded `SELECT *` without LIMIT |
+
 </details>
+
+### Deep Security Review (On-Demand)
+
+For sensitive features (auth, payments, AI, data access), run the security review agent:
+
+```
+review blueprint payment-integration for security
+```
+
+The agent checks 8 security categories (OWASP Top 10 + AI/LLM specific) and produces a severity-rated report:
+
+| Severity | Meaning |
+|---|---|
+| Critical | Exploitable, causes data breach or system compromise |
+| High | Exploitable with significant impact |
+| Medium | Best practice violation, indirect risk |
+| Low | Minor issue, defense-in-depth |
 
 ---
 

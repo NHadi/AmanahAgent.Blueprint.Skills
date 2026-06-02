@@ -135,6 +135,46 @@ Before generating anything, gather:
 ### Q-2: Security
 - **Target**: {specific target, e.g., "All endpoints require authentication"}
 
+## Security Considerations
+
+> Identify security risks specific to this feature. Think about: authentication, authorization, input validation, data exposure, rate limiting. Not every feature has security implications — if none, write "None — this feature does not handle sensitive data or expose new endpoints."
+
+### Threat Surface
+{What new attack vectors does this feature create? E.g., "New public API endpoint accepts user-uploaded files — risk of malicious file upload"}
+
+### Security Requirements
+- {Requirement 1, e.g., "All endpoints require authenticated user via JWT"}
+- {Requirement 2, e.g., "File uploads validated: max 5MB, MIME type whitelist [image/jpeg, image/png, application/pdf]"}
+- {Requirement 3, e.g., "Rate limit: 10 uploads per minute per user"}
+
+### Data Sensitivity
+{What data does this feature handle? E.g., "Stores user email and phone number — PII. Must not be exposed in logs or error messages."}
+
+## Performance & Scalability Considerations
+
+> Identify performance risks specific to this feature. Think about: expected load, query patterns, external calls, background work, caching. Not every feature has performance implications — if none, write "None — low traffic, single-user, no external calls."
+
+### Expected Load
+{How many requests/sec? How many records? E.g., "Expected 100 req/sec at peak, table grows by 50K rows/month"}
+
+### Database Performance
+- **Queries**: {Which queries are hot? Do they need indexes? E.g., "List endpoint filters by `tenant_id + status + created_at` — needs composite index"}
+- **N+1 risks**: {Any relationships that could cause N+1 queries? E.g., "Loading conversation with messages — use `selectinload` to avoid N+1"}
+- **Large tables**: {Will any table exceed 100K rows? Need partitioning or archiving?}
+
+### External Calls & Timeouts
+- {External call 1, e.g., "Gemini LLM call — p95 latency 3s, must have 30s timeout"}
+- {External call 2, e.g., "Stripe API — must have 10s timeout + retry with backoff"}
+
+### Background Work
+{Anything that takes >5 seconds and should NOT block the HTTP request? E.g., "Video rendering after upload — offload to Celery worker, return 202 Accepted with job_id"}
+
+### Concurrency Risks
+{Any check-then-act patterns that need protection? E.g., "Credit deduction: read balance → check → deduct. Needs SELECT FOR UPDATE to prevent race condition"}
+
+### Caching Strategy
+{What can be cached? E.g., "Cost map cached in Redis, 5-min TTL. User profile cached in Redis, 1-hour TTL. Invalidate on profile update."}
+
 ## Risks & Mitigations
 
 | Risk | Impact | Likelihood | Mitigation |
@@ -169,6 +209,14 @@ Before generating anything, gather:
 - *What if step 3 of a 5-step process fails — are steps 1-2 rolled back?*
 - *What if the feature is used with non-ASCII characters (Arabic, CJK, emoji)?*
 - *What if the database is under heavy load and queries are slow?*
+- *Security: What if the user tries to access another tenant's data? (IDOR)*
+- *Security: What if the input contains SQL injection / XSS payload?*
+- *Security: What if the user sends 1000 requests per second? (rate limiting)*
+- *Security: What if the auth token is expired, revoked, or tampered?*
+- *Performance: What if the table grows to 1M rows? Does the query still finish in <200ms?*
+- *Performance: What if 100 users do this simultaneously? Race condition?*
+- *Performance: What if the external API takes 30s to respond or never responds? (timeout)*
+- *Scalability: What if the request payload is 10MB? (memory, parsing time)*
 
 ## Open Decisions
 
@@ -488,6 +536,18 @@ After generating all three files:
 15. **Test-Property coverage**: Count Correctness Properties in how.md. Count test items in now.md. Every Property must have at least one test. Flag orphans.
 16. **Edge case test coverage**: Count edge cases in what.md. Count edge case tests in now.md. Every edge case must have at least one test. Flag gaps.
 17. **Function name consistency**: Check that function/variable names in now.md match exactly with how.md code examples. Flag mismatches (e.g., `_truncate` vs `truncate`, private vs public).
+18. **SQL injection check**: Search how.md code examples for string concatenation in SQL queries (e.g., `f"SELECT ... {user_input}"`). All queries MUST use parameterized statements. Flag any raw SQL with string interpolation.
+19. **Auth check on endpoints**: Every endpoint in how.md architecture diagram and code examples MUST have auth dependency (`Depends(get_current_user)` or equivalent). Flag any endpoint without auth.
+20. **Input validation check**: Every function in how.md that accepts user input MUST validate it (Pydantic schema, type check, or explicit validation). Flag functions that accept `str` or `dict` without validation.
+21. **Secret exposure check**: Search all code examples for hardcoded API keys, passwords, tokens, or connection strings. All secrets MUST come from environment variables / settings. Flag any hardcoded credentials.
+22. **tenant_id isolation check**: Every database query in how.md code examples MUST filter by `tenant_id` (or equivalent multi-tenant isolation key). Flag queries without tenant scoping.
+23. **Error message information leak**: Error responses in how.md error handling table MUST NOT expose internal details (stack traces, SQL errors, internal IPs). Flag error messages like `"Database error: {sql_exception}"`.
+24. **Database index check**: If how.md has queries with `WHERE`, `ORDER BY`, or `JOIN` on non-PK columns, the corresponding action item in now.md MUST include a database index creation. Flag queries filtering on unindexed columns (e.g., `WHERE status = 'active'` without index on `status`).
+25. **N+1 query check**: Search how.md code examples for patterns that cause N+1 queries (looping over results and making individual queries per item). Flag any `for item in results: await db.execute(select(...).where(id == item.id))` patterns. Recommend batch loading with `IN` clause or `selectinload`.
+26. **Long-running task check**: Any operation that could take >5 seconds (AI calls, file processing, bulk operations, external API calls) MUST be offloaded to a background worker/task queue. Flag synchronous blocking calls in request handlers. Look for: direct LLM calls without timeout, large file processing in request scope, no `asyncio.to_thread()` for CPU-bound work.
+27. **Timeout check**: External API calls and LLM calls in how.md MUST have explicit timeouts configured. Flag `httpx.get()` without `timeout=`, `client.generate_content()` without timeout, or any external call that could hang indefinitely.
+28. **Concurrency / race condition check**: If how.md has check-then-act patterns (read balance → check → write; read record → check → update), the code MUST use row locking (`SELECT FOR UPDATE`), optimistic locking (version column), or idempotency keys. Flag any check-then-act without concurrency protection.
+29. **Pagination / unbounded result check**: Every list endpoint or query in how.md MUST have pagination or a hard limit. Flag `select(Model).all()` or `findMany({})` without `.limit()`, `.offset()`, or pagination params.
 
 ---
 

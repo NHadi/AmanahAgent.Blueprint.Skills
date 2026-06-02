@@ -88,10 +88,12 @@ Structure:
      - Each criterion MUST include a **concrete example** with actual values (not just abstract descriptions)
      - Example: `WHEN balance is 0.5 and cost is 1.0, THEN reject with HTTP 402 {required_credits: 1.0, current_balance: 0.5, message: "Insufficient credits"}`
 4. **Quality Targets** — Q-1, Q-2, ... with measurable targets (performance, security, scalability)
-5. **Risks & Mitigations** — Table: `Risk | Impact | Likelihood | Mitigation`
+5. **Security Considerations** — Threat surface, security requirements, data sensitivity for this feature
+6. **Performance & Scalability** — Expected load, DB indexes, N+1 risks, timeouts, background work, concurrency, caching
+7. **Risks & Mitigations** — Table: `Risk | Impact | Likelihood | Mitigation`
    - Think like a senior engineer: What could go wrong in production? What edge cases could break this?
    - Consider: external API failures, data migration risks, performance bottlenecks, backwards compatibility
-6. **Edge Cases** — Table: `Scenario | Expected Behavior | Why It's Tricky`
+8. **Edge Cases** — Table: `Scenario | Expected Behavior | Why It's Tricky`
    - **This is required.** Actively hunt for edge cases using this checklist:
      - Empty/null/missing inputs
      - Boundary values (0, max length, negative, exceeding limits)
@@ -104,11 +106,11 @@ Structure:
      - Permission edge cases (wrong role, inactive subscription, expired token)
      - Large data volumes (1000 items when you expected 10)
    - For each edge case, specify the EXACT expected behavior — not "handle gracefully" but "return HTTP 422 with message X"
-7. **Open Decisions** — Checkbox list of questions that need answers BEFORE implementation
+9. **Open Decisions** — Checkbox list of questions that need answers BEFORE implementation
    - If no open decisions exist, write: "None — all decisions resolved"
-7. **Boundaries** — Technical and business constraints
-8. **Not Doing** — Explicitly excluded items
-9. **Depends On** — Internal and external dependencies
+10. **Boundaries** — Technical and business constraints
+11. **Not Doing** — Explicitly excluded items
+12. **Depends On** — Internal and external dependencies
 10. **Revision Log** — Table: `Date | What Changed | Why` — initialized with creation date on first generation
 
 ### 5. Generate how.md — HOW it's implemented
@@ -195,6 +197,18 @@ Before finishing, verify:
 - [ ] **Test-Property coverage**: Every Correctness Property in how.md has at least one corresponding test in now.md
 - [ ] **Edge case test coverage**: Every edge case in what.md has at least one test in now.md
 - [ ] **Function name consistency**: Function/variable names in now.md match how.md code examples exactly (private vs public, underscore prefix)
+- [ ] **SQL injection check**: No string concatenation in SQL queries. All queries use parameterized statements.
+- [ ] **Auth on all endpoints**: Every endpoint in code examples has auth dependency (`Depends(get_current_user)` or equivalent)
+- [ ] **Input validation**: All functions accepting user input validate it (Pydantic schema, type check, explicit validation)
+- [ ] **No hardcoded secrets**: All API keys, passwords, tokens come from environment variables / settings. No credentials in code.
+- [ ] **tenant_id isolation**: Every database query filters by `tenant_id` (or equivalent multi-tenant isolation key)
+- [ ] **No information leak in errors**: Error responses do not expose stack traces, SQL errors, or internal details
+- [ ] **Database indexes**: Queries with WHERE/ORDER BY/JOIN on non-PK columns have corresponding index in action items
+- [ ] **No N+1 queries**: No loop-then-query patterns. Use batch loading (IN clause, selectinload) for relationships
+- [ ] **Long tasks are backgrounded**: Operations >5s (AI calls, file processing, bulk ops) are offloaded to workers, not blocking HTTP handlers
+- [ ] **External call timeouts**: All external API/LLM calls have explicit timeouts. No call can hang indefinitely
+- [ ] **Concurrency protection**: Check-then-act patterns use row locking (SELECT FOR UPDATE), optimistic locking, or idempotency keys
+- [ ] **Pagination on all lists**: Every list query has pagination or hard limit. No unbounded `SELECT *` patterns
 
 ## Quality Standards
 
