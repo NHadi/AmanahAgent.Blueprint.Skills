@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://amanah-blueprint.amanahagent.cloud/sitemap.xml
