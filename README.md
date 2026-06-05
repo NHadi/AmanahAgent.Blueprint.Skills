@@ -41,6 +41,19 @@ Amanah Blueprint is installed as a **global skill** in Gemini CLI, making it ava
    Copy-Item "skill-source/gemini-commands/*.toml" -Destination $dest
    ```
 
+### Manual Installation
+
+For environments where `npx` or `gemini skills` are not available, you can install the framework manually:
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/NHadi/AmanahAgent.Blueprint.Skills.git
+cd AmanahAgent.Blueprint.Skills
+
+# 2. Run the installation script
+bash install.sh
+```
+
 ---
 
 ## Quick Start

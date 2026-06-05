@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # Amanah Blueprint — One-line installer
-# Usage: curl -sSL https://raw.githubusercontent.com/NHadi/AmanahAgent.Blueprint.Skills/main/install.sh | bash
 #
 # Copies .amanah/ to current directory and bootstraps slash commands.
 
