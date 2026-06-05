@@ -335,44 +335,47 @@ The generator reads **all** `.md` files in `.amanah/atlas/` — core and custom 
 Every blueprint enforces a set of quality gates before it is considered complete. These are what eliminate the revision cycle typical of AI-generated specs.
 
 ```mermaid
-mindmap
-  root((Quality Gates))
-    Edge Cases
-      Minimum 5 per feature
-      Exact expected behavior specified
-      Trace to Correctness Properties
-      Trace to Tests
-    Code Quality
-      No stubbed code anywhere
-      No deprecated APIs
-      Empty input guards
-      Circular import detection
-    Correctness
-      Formal Properties
-      Property-to-code consistency
-      Property-to-test coverage
-    Reuse First
-      Existing code inventory
-      File path validation
-      Conflict detection across blueprints
-    Traceability
-      M-N to action items
-      Action items to tests
-      Edge cases to Properties
-    Security
-      SQL injection check
-      Auth on all endpoints
-      Input validation
-      No hardcoded secrets
-      tenant_id isolation
-      No error information leak
-    Performance
-      DB indexes on non-PK columns
-      No N+1 queries
-      Long tasks backgrounded
-      External call timeouts
-      Concurrency protection
-      Pagination on all list endpoints
+graph LR
+    QG((29 Quality Gates))
+
+    QG --> EC[Edge Cases]
+    QG --> CQ[Code Quality]
+    QG --> CP[Correctness]
+    QG --> RF[Reuse First]
+    QG --> TR[Traceability]
+    QG --> SC[Security]
+    QG --> PF[Performance]
+
+    EC --> EC1["5+ per feature"]
+    EC --> EC2["Exact behavior"]
+    EC --> EC3["Trace to tests"]
+
+    CQ --> CQ1["No stubs"]
+    CQ --> CQ2["No deprecated APIs"]
+    CQ --> CQ3["No circular imports"]
+
+    CP --> CP1["Formal properties"]
+    CP --> CP2["Property-to-code"]
+    CP --> CP3["Property-to-test"]
+
+    SC --> SC1["SQL injection check"]
+    SC --> SC2["Auth on endpoints"]
+    SC --> SC3["No hardcoded secrets"]
+    SC --> SC4["tenant_id isolation"]
+
+    PF --> PF1["DB indexes"]
+    PF --> PF2["No N+1 queries"]
+    PF --> PF3["Timeouts set"]
+    PF --> PF4["Pagination"]
+
+    style QG fill:#3498DB,color:#fff
+    style EC fill:#E67E22,color:#fff
+    style CQ fill:#9B59B6,color:#fff
+    style CP fill:#1ABC9C,color:#fff
+    style RF fill:#3498DB,color:#fff
+    style TR fill:#2ECC71,color:#fff
+    style SC fill:#E74C3C,color:#fff
+    style PF fill:#F39C12,color:#fff
 ```
 
 ### Validation Checklist (Excerpt)
