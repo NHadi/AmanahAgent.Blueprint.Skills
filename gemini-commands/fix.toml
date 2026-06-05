@@ -1,0 +1,2 @@
+description = "Generate a bug fix plan (Lite Mode — fix.md)"
+prompt = "Investigate the bug/issue {{arguments}} and generate a fix.md plan using the amanah-blueprint skill (Lite Mode)."

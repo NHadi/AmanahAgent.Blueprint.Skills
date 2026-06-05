@@ -1,0 +1,2 @@
+description = "Read an existing blueprint and show implementation progress"
+prompt = "Read the blueprint for {{arguments}} and summarize the implementation progress from its now.md (or fix.md) action items."

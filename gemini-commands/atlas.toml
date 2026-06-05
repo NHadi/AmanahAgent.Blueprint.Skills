@@ -1,0 +1,2 @@
+description = "Regenerate the project atlas (5 context maps from codebase)"
+prompt = "Scan the codebase and regenerate the project atlas files in .amanah/atlas/ using the amanah-atlas-generator skill."

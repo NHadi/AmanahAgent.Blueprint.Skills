@@ -1,12 +1,34 @@
 ---
 name: amanah-blueprint
-description: Use for blueprint, create blueprint, plan feature, spec for X, what/how/now docs, feature planning, blueprint for X, fix bug X, hotfix, bug analysis, investigate. Generates implementation-ready feature blueprints (what/how/now) or bug fix plans (fix.md).
-version: 5.0.0
+description: Use for blueprint, create blueprint, plan feature, spec for X, what/how/now docs, feature planning, blueprint for X, fix bug X, hotfix, bug analysis, investigate. Generates implementation-ready feature blueprints (what/how/now) or bug fix plans (fix.md). Compatible with Claude Code and Gemini CLI.
+version: 5.1.0
 ---
 
 # Amanah Blueprint Generator
 
 Generates implementation-ready specs in `.amanah/blueprints/{feature-name}/`. Supports two modes: **Full** for new features, **Lite** for bug fixes and small changes.
+
+## Multi-Agent Compatibility
+
+Amanah Blueprint is designed to work seamlessly with:
+- **Claude Code**: Via local project-level skills and agents.
+- **Gemini CLI**: Via global user-level skills and packaged `.skill` files.
+
+## Global Slash Commands
+
+| Command | Usage | Description |
+| :--- | :--- | :--- |
+| `/setup` | `/setup` | One-time project initialization (Detect stack + Generate Atlas). |
+| `/atlas` | `/atlas` | Scans the codebase to refresh context maps in `.amanah/atlas/`. |
+| `/blueprint` | `/blueprint <name>` | Generates a 3-step feature spec (`what`, `how`, `now`). |
+| `/fix` | `/fix <description>` | Generates a single-file bug fix plan (`fix.md`). |
+| `/build` | `/build <name>` | **Autonomous implementation** (Task & Mark) until complete. |
+| `/spec` | `/spec <feature>` | Reads existing blueprints and shows implementation progress. |
+| `/review` | `/review <file>` | Reviews code against `.amanah/atlas/conventions.md`. |
+| `/test` | `/test <feature>` | Scaffolds Vitest tests from your blueprint strategy. |
+| `/audit` | `/audit <file>` | Runs the 29 Quality Gates (Security, Perf, Traceability). |
+| `/bridge` | `/bridge <path>` | Sync external API/Backend schemas into project context. |
+| `/history` | `/history <topic>` | Search past blueprints for consistent architectural patterns. |
 
 ## Atlas (Project Context Maps)
 

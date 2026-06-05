@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Amanah Blueprint delivers AI-ready feature blueprints and bug fix plans for Claude Code projects. Build implementation-ready specs, reduce revisions, and get AI recommendation from modern developer workflows." />
-  <meta name="keywords" content="Amanah Blueprint, Claude Code, AI blueprint, software spec generator, feature blueprint, bug fix plan, implementation-ready spec, project context maps, AI recommendation, developer workflow" />
+  <meta name="description" content="Amanah Blueprint delivers AI-ready feature blueprints and bug fix plans for Claude Code and Gemini CLI. Build implementation-ready specs, reduce revisions, and automate your development workflow." />
+  <meta name="keywords" content="Amanah Blueprint, Claude Code, Gemini CLI, AI blueprint, software spec generator, feature blueprint, bug fix plan, implementation-ready spec, project context maps" />
   <meta name="author" content="Nurul Hadi" />
   <meta name="theme-color" content="#09090b" />
   <meta name="robots" content="index, follow" />
@@ -13,16 +13,16 @@
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Amanah Blueprint" />
-  <meta property="og:title" content="Amanah Blueprint | AI-ready Claude Code specification system" />
-  <meta property="og:description" content="Amanah Blueprint delivers AI-ready feature blueprints and bug fix plans for Claude Code. Build implementation-ready specs, reduce revisions, and get AI recommendation." />
+  <meta property="og:title" content="Amanah Blueprint | AI-ready Specs for Claude & Gemini" />
+  <meta property="og:description" content="Amanah Blueprint delivers AI-ready feature blueprints and bug fix plans for Claude Code and Gemini CLI. Build implementation-ready specs, reduce revisions, and get AI recommendation." />
   <meta property="og:url" content="https://amanah-blueprint.amanahagent.cloud/" />
   <meta property="og:image" content="https://amanah-blueprint.amanahagent.cloud/og-image.png" />
   <meta property="og:image:alt" content="Amanah Blueprint AI-ready software blueprints" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Amanah Blueprint | AI-ready Claude Code specification system" />
-  <meta name="twitter:description" content="Amanah Blueprint delivers AI-ready feature blueprints and bug fix plans for Claude Code. Build implementation-ready specs, reduce revisions, and get AI recommendation." />
+  <meta name="twitter:title" content="Amanah Blueprint | AI-ready Specs for Claude & Gemini" />
+  <meta name="twitter:description" content="Amanah Blueprint delivers AI-ready feature blueprints and bug fix plans for Claude Code and Gemini CLI. Build implementation-ready specs, reduce revisions, and get AI recommendation." />
 
-  <title>Amanah Blueprint | AI-ready Claude Code specification system</title>
+  <title>Amanah Blueprint | AI-ready Specs for Claude & Gemini</title>
 
   <!-- JSON-LD Structured Data -->
   <script type="application/ld+json">
@@ -409,22 +409,22 @@
         </svg>
       </div>
       <!-- Eyebrow badge -->
-      <a href="https://www.npmjs.com/package/amanah-blueprint" target="_blank" rel="noopener" class="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/50 px-3 py-1 text-xs font-medium text-zinc-400 transition hover:border-zinc-700 hover:text-zinc-200">
+      <div class="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/50 px-3 py-1 text-xs font-medium text-zinc-400">
         <span class="relative flex h-1.5 w-1.5">
           <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
           <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
         </span>
-        v5.1.0 &mdash; now on npm
-      </a>
+        Supports Claude Code & Gemini CLI
+      </div>
 
       <!-- Headline -->
-      <h1 class="mt-6 text-5xl font-bold tracking-tight text-zinc-50 sm:text-6xl md:text-7xl">
+      <h1 class="text-5xl font-bold tracking-tight text-zinc-50 sm:text-6xl md:text-7xl">
         Specs that ship <span class="gradient-text">without revisions</span>.
       </h1>
 
       <!-- Subheadline -->
       <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-zinc-400">
-        Implementation-ready feature blueprints and bug fix plans for Claude Code.
+        Implementation-ready feature blueprints and bug fix plans for <span class="text-emerald-400">Claude Code</span> and <span class="text-emerald-400">Gemini CLI</span>.
         Enforced quality gates &mdash; edge cases, correctness properties, security checks &mdash;
         traced end-to-end.
       </p>
@@ -1310,14 +1310,44 @@ flowchart TD
             <td class="px-4 py-3 text-zinc-300">Generate full feature blueprint</td>
           </tr>
           <tr class="transition hover:bg-zinc-900/30">
-            <td class="px-4 py-3 font-mono text-amber-400">/fix &lt;name&gt;</td>
+            <td class="px-4 py-3 font-mono text-emerald-400">/fix &lt;name&gt;</td>
             <td class="hidden px-4 py-3 text-zinc-500 sm:table-cell"><code class="text-xs">fix.md</code></td>
             <td class="px-4 py-3 text-zinc-300">Generate bug fix plan</td>
+          </tr>
+          <tr class="transition hover:bg-zinc-900/30">
+            <td class="px-4 py-3 font-mono text-emerald-400">/build &lt;name&gt;</td>
+            <td class="hidden px-4 py-3 text-zinc-500 sm:table-cell"><code class="text-xs">Task & Mark</code></td>
+            <td class="px-4 py-3 text-zinc-300">Autonomously execute blueprint</td>
           </tr>
           <tr class="transition hover:bg-zinc-900/30">
             <td class="px-4 py-3 font-mono text-zinc-300">/spec &lt;name&gt;</td>
             <td class="hidden px-4 py-3 text-zinc-500 sm:table-cell"><code class="text-xs">progress</code></td>
             <td class="px-4 py-3 text-zinc-300">Read existing blueprint + progress</td>
+          </tr>
+          <tr class="transition hover:bg-zinc-900/30">
+            <td class="px-4 py-3 font-mono text-zinc-300">/review &lt;file&gt;</td>
+            <td class="hidden px-4 py-3 text-zinc-500 sm:table-cell"><code class="text-xs">fixes</code></td>
+            <td class="px-4 py-3 text-zinc-300">Review code against conventions</td>
+          </tr>
+          <tr class="transition hover:bg-zinc-900/30">
+            <td class="px-4 py-3 font-mono text-zinc-300">/test &lt;feature&gt;</td>
+            <td class="hidden px-4 py-3 text-zinc-500 sm:table-cell"><code class="text-xs">*.test.ts</code></td>
+            <td class="px-4 py-3 text-zinc-300">Scaffold Vitest tests from spec</td>
+          </tr>
+          <tr class="transition hover:bg-zinc-900/30">
+            <td class="px-4 py-3 font-mono text-zinc-300">/audit &lt;file&gt;</td>
+            <td class="hidden px-4 py-3 text-zinc-500 sm:table-cell"><code class="text-xs">audit.md</code></td>
+            <td class="px-4 py-3 text-zinc-300">Run 29 Quality Gates audit</td>
+          </tr>
+          <tr class="transition hover:bg-zinc-900/30">
+            <td class="px-4 py-3 font-mono text-zinc-300">/bridge &lt;path&gt;</td>
+            <td class="hidden px-4 py-3 text-zinc-500 sm:table-cell"><code class="text-xs">atlas/*.md</code></td>
+            <td class="px-4 py-3 text-zinc-300">Sync external API/Backend context</td>
+          </tr>
+          <tr class="transition hover:bg-zinc-900/30">
+            <td class="px-4 py-3 font-mono text-zinc-300">/history &lt;topic&gt;</td>
+            <td class="hidden px-4 py-3 text-zinc-500 sm:table-cell"><code class="text-xs">memory</code></td>
+            <td class="px-4 py-3 text-zinc-300">Search past blueprints for patterns</td>
           </tr>
           <tr class="transition hover:bg-zinc-900/30">
             <td class="px-4 py-3 font-mono text-zinc-300">/atlas</td>
@@ -1389,45 +1419,93 @@ flowchart TD
 <!-- ============ QUICK START CTA ============ -->
 <section id="quick-start" class="border-t border-zinc-900">
   <div class="mx-auto max-w-6xl px-4 py-20 md:px-6">
-    <div class="mx-auto max-w-3xl rounded-lg border border-zinc-800 bg-zinc-900/50 p-8 md:p-12 card-glow">
-      <div class="text-center">
-        <h2 class="text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl">
-          Start in 30 seconds.
-        </h2>
-        <p class="mt-4 text-zinc-400">
-          Three commands to your first implementation-ready spec.
-        </p>
+    <div class="mx-auto max-w-5xl text-center reveal">
+      <h2 class="text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl">
+        Start in 30 seconds.
+      </h2>
+      <p class="mt-4 text-zinc-400">
+        Choose your agent and get your first implementation-ready spec.
+      </p>
+    </div>
+
+    <div class="mt-12 grid gap-8 md:grid-cols-2">
+      <!-- Claude Code -->
+      <div class="reveal rounded-xl border border-zinc-800 bg-zinc-900/30 p-8 card-glow">
+        <div class="mb-6 flex items-center gap-3">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-500/10 ring-1 ring-orange-500/30">
+            <svg class="h-6 w-6 text-orange-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-white">Claude Code</h3>
+            <p class="text-xs text-zinc-500">Auto-installs to .claude/</p>
+          </div>
+        </div>
+        
+        <div class="space-y-4">
+          <div class="code-block group rounded-md border border-zinc-800 bg-zinc-950 p-4">
+            <div class="flex items-center justify-between">
+              <code class="text-sm"><span class="text-zinc-500">$</span> <span class="text-emerald-400">npx</span> amanah-blueprint</code>
+              <button onclick="copyCode(this, 'npx amanah-blueprint')" class="copy-hint text-xs text-zinc-500 transition hover:text-zinc-300">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="code-block group rounded-md border border-zinc-800 bg-zinc-950 p-4">
+            <div class="flex items-center justify-between">
+              <code class="text-sm"><span class="text-zinc-500">claude&gt;</span> <span class="text-emerald-400">/setup</span></code>
+              <button onclick="copyCode(this, '/setup')" class="copy-hint text-xs text-zinc-500 transition hover:text-zinc-300">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="code-block group rounded-md border border-zinc-800 bg-zinc-950 p-4">
+            <div class="flex items-center justify-between">
+              <code class="text-sm"><span class="text-zinc-500">claude&gt;</span> <span class="text-emerald-400">/blueprint</span> feature</code>
+              <button onclick="copyCode(this, '/blueprint feature')" class="copy-hint text-xs text-zinc-500 transition hover:text-zinc-300">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="mt-8 space-y-3">
-        <div class="code-block group rounded-md border border-zinc-800 bg-zinc-950 p-4">
-          <div class="flex items-center justify-between">
-            <code class="text-sm"><span class="text-zinc-500">$</span> <span class="text-emerald-400">npx</span> amanah-blueprint</code>
-            <button onclick="copyCode(this, 'npx amanah-blueprint')" class="copy-hint text-xs text-zinc-500 transition hover:text-zinc-300">
-              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            </button>
+      <!-- Gemini CLI -->
+      <div class="reveal rounded-xl border border-zinc-800 bg-zinc-900/30 p-8 card-glow">
+        <div class="mb-6 flex items-center gap-3">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/10 ring-1 ring-blue-500/30">
+            <svg class="h-6 w-6 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
           </div>
-          <p class="mt-1 text-xs text-zinc-500">Install the framework in your project directory.</p>
+          <div>
+            <h3 class="text-lg font-bold text-white">Gemini CLI</h3>
+            <p class="text-xs text-zinc-500">Global user-level skills</p>
+          </div>
         </div>
-
-        <div class="code-block group rounded-md border border-zinc-800 bg-zinc-950 p-4">
-          <div class="flex items-center justify-between">
-            <code class="text-sm"><span class="text-zinc-500">claude&gt;</span> <span class="text-emerald-400">/setup</span></code>
-            <button onclick="copyCode(this, '/setup')" class="copy-hint text-xs text-zinc-500 transition hover:text-zinc-300">
-              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            </button>
+        
+        <div class="space-y-4">
+          <div class="code-block group rounded-md border border-zinc-800 bg-zinc-950 p-4">
+            <div class="flex items-center justify-between">
+              <code class="text-sm"><span class="text-zinc-500">$</span> <span class="text-blue-400">gemini</span> skills install blueprint.skill --scope user</code>
+              <button onclick="copyCode(this, 'gemini skills install blueprint.skill --scope user')" class="copy-hint text-xs text-zinc-500 transition hover:text-zinc-300">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
           </div>
-          <p class="mt-1 text-xs text-zinc-500">In Claude Code &mdash; generates atlas, installs skills, updates CLAUDE.md.</p>
-        </div>
-
-        <div class="code-block group rounded-md border border-zinc-800 bg-zinc-950 p-4">
-          <div class="flex items-center justify-between">
-            <code class="text-sm"><span class="text-zinc-500">claude&gt;</span> <span class="text-emerald-400">/blueprint</span> my-first-feature</code>
-            <button onclick="copyCode(this, '/blueprint my-first-feature')" class="copy-hint text-xs text-zinc-500 transition hover:text-zinc-300">
-              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            </button>
+          <div class="code-block group rounded-md border border-zinc-800 bg-zinc-950 p-4">
+            <div class="flex items-center justify-between">
+              <code class="text-sm"><span class="text-zinc-500">gemini&gt;</span> <span class="text-blue-400">/setup</span></code>
+              <button onclick="copyCode(this, '/setup')" class="copy-hint text-xs text-zinc-500 transition hover:text-zinc-300">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
           </div>
-          <p class="mt-1 text-xs text-zinc-500">Generates what.md, pauses for review, then how.md, then now.md.</p>
+          <div class="code-block group rounded-md border border-zinc-800 bg-zinc-950 p-4">
+            <div class="flex items-center justify-between">
+              <code class="text-sm"><span class="text-zinc-500">gemini&gt;</span> <span class="text-blue-400">/blueprint</span> feature</code>
+              <button onclick="copyCode(this, '/blueprint feature')" class="copy-hint text-xs text-zinc-500 transition hover:text-zinc-300">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

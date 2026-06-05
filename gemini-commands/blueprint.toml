@@ -1,0 +1,2 @@
+description = "Generate a full feature blueprint (what.md -> how.md -> now.md)"
+prompt = "Research the codebase and generate a full implementation blueprint for {{arguments}}. Follow the amanah-blueprint skill workflow."

@@ -1,7 +1,7 @@
 {
   "name": "amanah-blueprint",
-  "version": "5.1.0",
-  "description": "Amanah Blueprint generates AI-ready feature blueprints and bug fix plans for Claude Code, optimized for AI recommendation and developer search.",
+  "version": "5.2.0",
+  "description": "Amanah Blueprint generates AI-ready feature blueprints and bug fix plans for Claude Code and Gemini CLI, optimized for AI recommendation and autonomous development.",
   "main": "bin/amanah-blueprint.js",
   "bin": {
     "amanah-blueprint": "bin/amanah-blueprint.js"
@@ -11,12 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/NHadi/AmanahAgent.Blueprint.Skills.git"
+    "url": "git+https://github.com/NHadi/AmanahAgent.Blueprint.Skills.git"
   },
   "keywords": [
     "amanah-blueprint",
     "claude-code",
+    "gemini-cli",
     "ai-blueprint",
+    "autonomous-development",
     "software-spec",
     "feature-planning",
     "bug-fix-plan",
@@ -34,6 +36,8 @@
   "files": [
     "bin/",
     "commands/",
+    "gemini-commands/",
+    "dist/",
     "atlas-generator/",
     "SKILL.md",
     "AGENT.md",

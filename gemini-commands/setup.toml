@@ -1,0 +1,2 @@
+description = "One-time project setup: scan stack, generate atlas, and initialize blueprint system"
+prompt = "Perform a full project setup: detect the tech stack, generate the initial project atlas, and initialize the .amanah/ structure for blueprints."
