@@ -627,7 +627,7 @@ Progress: 1/9 tasks complete (11%)
 ✅ 1.2 Create cost map table
 Progress: 2/9 tasks complete (22%)
 
-⏭️ Checkpoint — Database ready
+Checkpoint — Database ready
 Progress: 2/9 tasks + 1/3 checkpoints
 ```
 
