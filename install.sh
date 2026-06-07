@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # Amanah Blueprint — One-line installer
-# Usage: curl -sSL https://raw.githubusercontent.com/NHadi/AmanahAgent.Blueprint.Skills/main/install.sh | bash
 #
 # Copies .amanah/ to current directory and bootstraps slash commands.
 
@@ -34,13 +33,14 @@ print "Downloading Amanah Blueprint..."
 
 # Method 1: git clone (preferred)
 if command -v git &>/dev/null; then
-    git clone --depth 1 "$REPO_URL" "$TMP_DIR" 2>/dev/null
+    git clone "$REPO_URL" "$TMP_DIR" 2>/dev/null
+    (cd "$TMP_DIR" && git checkout 14305c7bebd257c9c7c9b7aff6c57d1cd74eed90)
     cp -r "$TMP_DIR/.amanah" .
     rm -rf "$TMP_DIR"
 
 # Method 2: curl + tar (fallback)
 elif command -v curl &>/dev/null; then
-    curl -sSL "https://github.com/NHadi/AmanahAgent.Blueprint.Skills/archive/refs/heads/main.tar.gz" -o "$TMP_DIR.tar.gz"
+    curl -sSL "https://github.com/NHadi/AmanahAgent.Blueprint.Skills/archive/14305c7bebd257c9c7c9b7aff6c57d1cd74eed90.tar.gz" -o "$TMP_DIR.tar.gz"
     mkdir -p "$TMP_DIR"
     tar -xzf "$TMP_DIR.tar.gz" -C "$TMP_DIR" --strip-components=1 2>/dev/null
     cp -r "$TMP_DIR/.amanah" .
