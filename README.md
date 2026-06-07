@@ -79,6 +79,7 @@ Once setup is complete, generate your first blueprint:
 | `/test <feature>` | Scaffold Vitest tests from blueprint | `*.test.ts/js` |
 | `/audit <file>` | Run 29 Quality Gates against code/spec | Audit report |
 | `/bridge <path>` | Sync external API/Backend schemas | Updated atlas context |
+| `/security-review [mode]` | Comprehensive security audit (12 domains, OWASP, UU PDP, ISO 27001) | Security report |
 | `/history <topic>` | Search past blueprints for patterns | Pattern synthesis |
 
 ---
@@ -340,6 +341,66 @@ The generator validates every blueprint against 29 checks before finalizing. Key
 - **Performance**: N+1 query detection, long-running task backgrounding, external call timeout enforcement, pagination enforcement, database index verification.
 - **Code quality**: No stubbed code (`# ... same as current ...`), no deprecated APIs (`get_event_loop`), no circular imports, function name consistency across files.
 - **File integrity**: All file paths verified via grep/glob. No phantom files.
+
+---
+
+## Security Review
+
+A dedicated security review agent that performs comprehensive audits across 12 security domains. Supports multiple review modes for targeted or full-codebase analysis.
+
+### Modes
+
+| Mode | Target | What It Checks |
+|------|--------|---------------|
+| `full` | Entire codebase | All 12 domains, compliance tables |
+| `module <path>` | Specific file/module | All domains for that module |
+| `blueprint <name>` | Blueprint spec | Security issues in what/how/now |
+| `compliance` | Codebase | OWASP Top 10, UU PDP, ISO 27001 gap analysis |
+| `infra` | Docker, cloud, network | Secrets, config, container security |
+| `api` | API layer | Auth, validation, rate limiting, CORS, headers |
+| `data` | Data layer | PII, encryption, tenant isolation, GCS |
+| `ai` | AI/LLM integrations | Prompt injection, cost abuse, output safety |
+| `mobile` | Expo/React Native | Storage, communication, code protection |
+| `deps` | Dependencies | Known vulnerabilities, supply chain |
+| `pen-test` | Codebase | Penetration testing guidance |
+
+### 12 Security Domains
+
+| # | Domain | OWASP Ref | Key Checks |
+|---|--------|-----------|------------|
+| 1 | Authentication & Authorization | A01 | JWT, RBAC, session management, token security |
+| 2 | Injection Attacks | A03 | SQL, command, template, path traversal |
+| 3 | Data Protection & Privacy | A02 | PII handling, encryption, UU PDP, GCS security |
+| 4 | Multi-Tenant Isolation | Project-specific | DB, API, storage, AI, cache, background jobs |
+| 5 | Input Validation | A03 | Request schemas, file uploads, URL params |
+| 6 | API Security | A01/A05/A07 | Rate limiting, CORS, security headers, error handling |
+| 7 | Infrastructure & Configuration | A05 | Docker, secrets, database, network, logging |
+| 8 | AI/LLM Security | OWASP LLM Top 10 | Prompt injection, data leakage, cost, output safety |
+| 9 | Mobile Security | OWASP Mobile Top 10 | Storage, communication, auth, code protection |
+| 10 | Dependency & Supply Chain | A06 | Vulnerability audit, dangerous deserialization |
+| 11 | Business Logic & Payment | A04 | Payment amounts, quotas, race conditions |
+| 12 | Logging, Monitoring & IR | A09 | Audit trail, alerting, incident response |
+
+### Usage
+
+```bash
+/security-review full              # Full codebase audit
+/security-review module api/v1/    # Targeted module review
+/security-review compliance uupdp  # UU PDP compliance check
+/security-review ai                # AI/LLM security review
+/security-review infra             # Infrastructure security
+```
+
+### Report Output
+
+Each review generates a structured report with:
+- **Executive summary** with severity counts (Critical/High/Medium/Low/Info)
+- **Detailed findings** with exact file:line references and code-level fix recommendations
+- **OWASP Top 10** compliance table
+- **UU PDP** (Indonesian Data Protection) compliance table
+- **ISO 27001** compliance table
+- **Priority remediation roadmap** (Immediate / Short-term / Medium-term / Long-term)
+- **Verdict**: APPROVED / NEEDS REMEDIATION / CRITICAL
 
 ---
 
@@ -774,9 +835,12 @@ Yes. Edit `SKILL.md` and `AGENT.md` in your project's `.amanah/` directory to ad
 │   ├── blueprint.md                       /blueprint <name>
 │   ├── fix.md                             /fix <name>
 │   ├── atlas.md                           /atlas
-│   └── spec.md                            /spec <name>
+│   ├── spec.md                            /spec <name>
+│   └── security-review.md                 /security-review [mode]
 ├── atlas-generator/                       Atlas generator skill
 │   └── SKILL.md
+├── security-review/                       Security review agent
+│   └── AGENT.md
 ├── atlas/                                 Project context maps (generated per-project)
 │   ├── product.md
 │   ├── tech.md
